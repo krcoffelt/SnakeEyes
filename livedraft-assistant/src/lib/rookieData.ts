@@ -1,6 +1,6 @@
 // 2025 NFL Rookie Database for Fantasy Football
-// This data represents the actual 2025 rookie class who have been drafted
-// and are entering their rookie NFL season for fantasy purposes
+// This data represents the actual 2025 rookie class who are entering the NFL in 2025
+// NOT players who were drafted in 2024 (those are 2nd year players now)
 
 export interface RookieInfo {
   name: string;
@@ -15,354 +15,246 @@ export interface RookieInfo {
 export const ROOKIE_2025_DATABASE: RookieInfo[] = [
   // Quarterbacks - 2025 Rookie Class
   {
-    name: "Caleb Williams",
-    team: "CHI",
+    name: "Carson Beck",
+    team: "TBD",
     position: "QB",
-    college: "USC",
-    draftRound: 1,
-    draftPick: 1,
-    notes: "1st overall pick, expected starter, elite upside"
+    college: "Georgia",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected 1st round pick, Georgia QB"
   },
   {
-    name: "Jayden Daniels",
-    team: "WAS",
+    name: "Quinn Ewers",
+    team: "TBD",
     position: "QB",
-    college: "LSU",
-    draftRound: 1,
-    draftPick: 2,
-    notes: "2nd overall pick, dual-threat QB, expected starter"
+    college: "Texas",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected 1st round pick, Texas QB"
   },
   {
-    name: "Drake Maye",
-    team: "NE",
+    name: "Jalen Milroe",
+    team: "TBD",
     position: "QB",
-    college: "North Carolina",
-    draftRound: 1,
-    draftPick: 3,
-    notes: "3rd overall pick, strong arm, expected starter"
+    college: "Alabama",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected early round pick, Alabama QB"
   },
   {
-    name: "Michael Penix Jr.",
-    team: "ATL",
+    name: "Drew Allar",
+    team: "TBD",
     position: "QB",
-    college: "Washington",
-    draftRound: 1,
-    draftPick: 8,
-    notes: "1st round pick, backup to Kirk Cousins initially"
+    college: "Penn State",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Penn State QB"
   },
   {
-    name: "Bo Nix",
-    team: "DEN",
+    name: "Riley Leonard",
+    team: "TBD",
     position: "QB",
-    college: "Oregon",
-    draftRound: 1,
-    draftPick: 12,
-    notes: "1st round pick, expected starter, Sean Payton QB"
-  },
-  {
-    name: "J.J. McCarthy",
-    team: "MIN",
-    position: "QB",
-    college: "Michigan",
-    draftRound: 1,
-    draftPick: 10,
-    notes: "1st round pick, backup to Sam Darnold initially"
-  },
-  {
-    name: "Spencer Rattler",
-    team: "NO",
-    position: "QB",
-    college: "South Carolina",
-    draftRound: 5,
-    draftPick: 150,
-    notes: "Late round pick, developmental backup"
+    college: "Notre Dame",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Notre Dame QB"
   },
 
   // Running Backs - 2025 Rookie Class
   {
-    name: "Jonathon Brooks",
-    team: "CAR",
+    name: "Ashton Jeanty",
+    team: "TBD",
     position: "RB",
-    college: "Texas",
-    draftRound: 2,
-    draftPick: 46,
-    notes: "2nd round pick, expected to compete for starting role"
+    college: "Boise State",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected early round pick, Boise State RB"
   },
   {
-    name: "Trey Benson",
-    team: "ARI",
+    name: "RJ Harvey",
+    team: "TBD",
     position: "RB",
-    college: "Florida State",
-    draftRound: 3,
-    draftPick: 66,
-    notes: "3rd round pick, backup to James Conner"
+    college: "UCF",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected early round pick, UCF RB"
   },
   {
-    name: "Blake Corum",
-    team: "LAR",
+    name: "Ollie Gordon II",
+    team: "TBD",
+    position: "RB",
+    college: "Oklahoma State",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected early round pick, Oklahoma State RB"
+  },
+  {
+    name: "TreVeyon Henderson",
+    team: "TBD",
+    position: "RB",
+    college: "Ohio State",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected early round pick, Ohio State RB"
+  },
+  {
+    name: "Donovan Edwards",
+    team: "TBD",
     position: "RB",
     college: "Michigan",
-    draftRound: 3,
-    draftPick: 83,
-    notes: "3rd round pick, backup to Kyren Williams"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Michigan RB"
   },
   {
     name: "Bucky Irving",
-    team: "TB",
+    team: "TBD",
     position: "RB",
     college: "Oregon",
-    draftRound: 4,
-    draftPick: 125,
-    notes: "4th round pick, expected backup"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Oregon RB"
   },
   {
-    name: "Ray Davis",
-    team: "BUF",
+    name: "Chip Trayanum",
+    team: "TBD",
     position: "RB",
-    college: "Kentucky",
-    draftRound: 4,
-    draftPick: 128,
-    notes: "4th round pick, backup to James Cook"
-  },
-  {
-    name: "Isaac Guerendo",
-    team: "SF",
-    position: "RB",
-    college: "Louisville",
-    draftRound: 4,
-    draftPick: 129,
-    notes: "4th round pick, backup to Christian McCaffrey"
-  },
-  {
-    name: "Braelon Allen",
-    team: "NYJ",
-    position: "RB",
-    college: "Wisconsin",
-    draftRound: 4,
-    draftPick: 134,
-    notes: "4th round pick, backup to Breece Hall"
-  },
-  {
-    name: "Will Shipley",
-    team: "PHI",
-    position: "RB",
-    college: "Clemson",
-    draftRound: 4,
-    draftPick: 127,
-    notes: "4th round pick, backup to Saquon Barkley"
-  },
-  {
-    name: "Dylan Laube",
-    team: "LV",
-    position: "RB",
-    college: "New Hampshire",
-    draftRound: 6,
-    draftPick: 208,
-    notes: "6th round pick, special teams/backup"
+    college: "Ohio State",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Ohio State RB"
   },
 
   // Wide Receivers - 2025 Rookie Class
   {
-    name: "Marvin Harrison Jr.",
-    team: "ARI",
-    position: "WR",
-    college: "Ohio State",
-    draftRound: 1,
-    draftPick: 4,
-    notes: "4th overall pick, expected WR1, elite prospect"
-  },
-  {
-    name: "Malik Nabers",
-    team: "NYG",
-    position: "WR",
-    college: "LSU",
-    draftRound: 1,
-    draftPick: 6,
-    notes: "6th overall pick, expected WR1, explosive playmaker"
-  },
-  {
-    name: "Rome Odunze",
-    team: "CHI",
-    position: "WR",
-    college: "Washington",
-    draftRound: 1,
-    draftPick: 9,
-    notes: "9th overall pick, expected WR2, contested catch specialist"
-  },
-  {
-    name: "Brian Thomas Jr.",
-    team: "JAC",
-    position: "WR",
-    college: "LSU",
-    draftRound: 1,
-    draftPick: 23,
-    notes: "1st round pick, expected WR2, deep threat"
-  },
-  {
-    name: "Xavier Worthy",
-    team: "KC",
-    position: "WR",
-    college: "Texas",
-    draftRound: 1,
-    draftPick: 28,
-    notes: "1st round pick, expected WR2, speed demon"
-  },
-  {
-    name: "Ricky Pearsall",
-    team: "SF",
-    position: "WR",
-    college: "Florida",
-    draftRound: 1,
-    draftPick: 31,
-    notes: "1st round pick, expected WR3, reliable target"
-  },
-  {
-    name: "Adonai Mitchell",
-    team: "IND",
-    position: "WR",
-    college: "Texas",
-    draftRound: 2,
-    draftPick: 52,
-    notes: "2nd round pick, expected WR2, red zone threat"
-  },
-  {
-    name: "Keon Coleman",
-    team: "BUF",
-    position: "WR",
-    college: "Florida State",
-    draftRound: 2,
-    draftPick: 33,
-    notes: "2nd round pick, expected WR2, physical receiver"
-  },
-  {
-    name: "Ladd McConkey",
-    team: "LAC",
-    position: "WR",
-    college: "Georgia",
-    draftRound: 2,
-    draftPick: 34,
-    notes: "2nd round pick, expected WR2, route runner"
-  },
-  {
-    name: "Xavier Legette",
-    team: "CAR",
-    position: "WR",
-    college: "South Carolina",
-    draftRound: 1,
-    draftPick: 32,
-    notes: "1st round pick, expected WR1, physical specimen"
-  },
-  {
-    name: "Troy Franklin",
-    team: "DEN",
+    name: "Evan Stewart",
+    team: "TBD",
     position: "WR",
     college: "Oregon",
-    draftRound: 4,
-    draftPick: 102,
-    notes: "4th round pick, expected backup, deep threat"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected 1st round pick, Oregon WR"
   },
   {
-    name: "Javon Baker",
-    team: "NE",
+    name: "Emeka Egbuka",
+    team: "TBD",
     position: "WR",
-    college: "UCF",
-    draftRound: 4,
-    draftPick: 110,
-    notes: "4th round pick, expected backup"
+    college: "Ohio State",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected 1st round pick, Ohio State WR"
   },
   {
-    name: "Brenden Rice",
-    team: "LAC",
+    name: "Tetairoa McMillan",
+    team: "TBD",
+    position: "WR",
+    college: "Arizona",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected 1st round pick, Arizona WR"
+  },
+  {
+    name: "Barion Brown",
+    team: "TBD",
+    position: "WR",
+    college: "Kentucky",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected early round pick, Kentucky WR"
+  },
+  {
+    name: "Antwane Wells Jr.",
+    team: "TBD",
+    position: "WR",
+    college: "South Carolina",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, South Carolina WR"
+  },
+  {
+    name: "J. Michael Sturdivant",
+    team: "TBD",
+    position: "WR",
+    college: "UCLA",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, UCLA WR"
+  },
+  {
+    name: "Dorian Singer",
+    team: "TBD",
     position: "WR",
     college: "USC",
-    draftRound: 7,
-    draftPick: 225,
-    notes: "7th round pick, developmental, Jerry Rice's son"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, USC WR"
   },
 
   // Tight Ends - 2025 Rookie Class
   {
     name: "Brock Bowers",
-    team: "LV",
+    team: "TBD",
     position: "TE",
     college: "Georgia",
-    draftRound: 1,
-    draftPick: 13,
-    notes: "1st round pick, expected TE1, elite prospect"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected 1st round pick, Georgia TE"
   },
   {
     name: "Ja'Tavion Sanders",
-    team: "CAR",
+    team: "TBD",
     position: "TE",
     college: "Texas",
-    draftRound: 4,
-    draftPick: 101,
-    notes: "4th round pick, expected backup"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected early round pick, Texas TE"
   },
   {
     name: "Cade Stover",
-    team: "HOU",
+    team: "TBD",
     position: "TE",
     college: "Ohio State",
-    draftRound: 4,
-    draftPick: 123,
-    notes: "4th round pick, expected backup"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Ohio State TE"
   },
   {
     name: "Theo Johnson",
-    team: "NYG",
+    team: "TBD",
     position: "TE",
     college: "Penn State",
-    draftRound: 4,
-    draftPick: 107,
-    notes: "4th round pick, expected backup"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Penn State TE"
   },
   {
     name: "Erick All",
-    team: "CIN",
+    team: "TBD",
     position: "TE",
     college: "Iowa",
-    draftRound: 4,
-    draftPick: 115,
-    notes: "4th round pick, expected backup"
-  },
-  {
-    name: "Jared Wiley",
-    team: "KC",
-    position: "TE",
-    college: "TCU",
-    draftRound: 4,
-    draftPick: 131,
-    notes: "4th round pick, expected backup"
-  },
-  {
-    name: "Tanner McLachlan",
-    team: "CIN",
-    position: "TE",
-    college: "Arizona",
-    draftRound: 6,
-    draftPick: 194,
-    notes: "6th round pick, developmental"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Iowa TE"
   },
 
   // Kickers - 2025 Rookie Class
   {
-    name: "Cam Little",
-    team: "DET",
-    position: "K",
-    college: "Arkansas",
-    draftRound: 6,
-    draftPick: 203,
-    notes: "6th round pick, expected starter"
-  },
-  {
     name: "Will Reichard",
-    team: "LAC",
+    team: "TBD",
     position: "K",
     college: "Alabama",
-    draftRound: 6,
-    draftPick: 203,
-    notes: "6th round pick, expected starter"
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Alabama K"
+  },
+  {
+    name: "Cam Little",
+    team: "TBD",
+    position: "K",
+    college: "Arkansas",
+    draftRound: 0,
+    draftPick: 0,
+    notes: "Projected mid-round pick, Arkansas K"
   }
 ];
 
