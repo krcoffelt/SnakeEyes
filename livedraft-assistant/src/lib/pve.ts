@@ -410,6 +410,10 @@ function computeOpponentMakeItBack(
     return out; // no intervening picks
   }
 
+  // Draft phase 0..1 to modulate aggressiveness (earlier rounds more ADP-driven)
+  const totalPicksApprox = teams * 15;
+  const phase = Math.max(0, Math.min(1, currentOverall / totalPicksApprox));
+
   // Build team rosters from drafted history
   const rosters: Record<number, RosterCounts> = {};
   for (let t = 1; t <= teams; t++) {
@@ -443,35 +447,65 @@ function computeOpponentMakeItBack(
   const posUrgency: Record<string, number> = {};
   Object.keys(scarcity).forEach(pos => { posUrgency[pos] = scarcity[pos]?.urgency ?? 0; });
 
-  const tau = 0.4; // softmax temperature
-  const adpWeight = 0.8; // strong influence from Sleeper ADP
-  const sAdp = Math.max(4, Math.round(teams / 2));
+  // Softer temperature yields more peaked choices around top options
+  const tau = 0.28;
+  // Stronger ADP weight; early rounds more ADP-driven
+  const baseAdpWeight = 1.2 + (1 - phase) * 0.3; // up to 1.5 early
 
-  // For each intervening team, compute a softmax over candidate players emphasizing Sleeper ADP proximity
   intervening.forEach(({ teamSlot, ovPick }) => {
     const { rosterNeeds: needs } = computeRosterNeeds(rosters[teamSlot], { flexCount: config.flexCount, ppr: config.ppr });
+
+    // Candidate window around current pick based only on Sleeper ADP
+    const windowPicks = Math.max(Math.round(teams * (0.6 + phase * 1.2)), Math.floor(teams / 2)); // ~0.6R early to ~1.8R late
+    const candidates = remaining.filter(p => {
+      const adp = p.slp_rank ?? null;
+      if (adp === null) return false;
+      return adp <= ovPick + windowPicks;
+    });
+    // Ensure we always have at least a handful of options by backfilling best by Sleeper ADP
+    const minCandidates = 12;
+    if (candidates.length < minCandidates) {
+      const fill = [...remaining]
+        .filter(p => !candidates.includes(p) && p.slp_rank != null)
+        .sort((a, b) => (a.slp_rank as number) - (b.slp_rank as number))
+        .slice(0, minCandidates - candidates.length);
+      candidates.push(...fill);
+    }
+
+    // Build scores for candidates
     const scores: number[] = [];
     const names: string[] = [];
-
-    for (let i = 0; i < remaining.length; i++) {
-      const p = remaining[i];
+    for (let i = 0; i < candidates.length; i++) {
+      const p = candidates[i];
       const pos = p.pos || '';
       names.push(p.player);
       const mv = marketValues[p.player] || 0;
       const tu = tierUrgency[p.player] || 0;
       const sc = pos ? (posUrgency[pos] || 0) : 0;
       const need = pos ? (needs[pos] || 0) : 0;
-      const adpRef = (p.slp_rank != null ? p.slp_rank : (p.und_adp != null ? p.und_adp : (p.ron_rank != null ? p.ron_rank : null)));
+
+      // Sleeper ADP only
+      const adpRef = p.slp_rank ?? null;
+      // If missing SLP ADP (rare), treat as neutral 0.5 signal
+      const sAdp = Math.max(2, Math.round(teams / 4)) + phase * 3; // ~2-3 early, ~5-6 later
       const adpSig = adpRef != null ? (1 / (1 + Math.exp(-(ovPick - adpRef) / sAdp))) : 0.5;
+      const pastDueBoost = adpRef != null && adpRef <= ovPick ? 0.3 : 0;
+
+      // Early-round positional priors (RB/WR more likely; TE slightly; QB/DEF/K less)
+      const early = (1 - phase);
+      let posPrior = 0;
+      if (pos === 'RB' || pos === 'WR') posPrior += 0.12 * early;
+      else if (pos === 'TE') posPrior += 0.04 * early;
+      else if (pos === 'QB') posPrior -= 0.08 * early;
+      else if (pos === 'DEF' || pos === 'K') posPrior -= 0.15 * early;
+
       let score = 0;
-      // Core drivers
       score += weights.w_value * mv;
       score += weights.w_tier * tu;
       score += weights.w_scar * sc;
       score += weights.w_need * need;
-      // Strong Sleeper ADP term
-      score += adpWeight * adpSig;
-      // Light global boosts
+      score += (1.2 + (1 - phase) * 0.3) * adpSig + pastDueBoost; // stronger SLP ADP early
+      score += posPrior;
       if (config.ppr === 'PPR' && (pos === 'WR' || pos === 'TE')) score += 0.04;
       else if (config.ppr === 'Half PPR' && (pos === 'WR' || pos === 'TE')) score += 0.02;
       if (pos === 'RB' || pos === 'WR') score += 0.02;
@@ -479,15 +513,14 @@ function computeOpponentMakeItBack(
       scores.push(Math.max(0, score));
     }
 
-    // Select top K for softmax to reduce noise
-    const indices = scores.map((s, i) => [s, i] as [number, number]).sort((a, b) => b[0] - a[0]).slice(0, 40).map(pair => pair[1]);
-    const expVals = indices.map(i => Math.exp(scores[i] / Math.max(0.001, tau)));
+    // Softmax over narrowed candidate set
+    const expVals = scores.map(s => Math.exp(s / Math.max(0.001, tau)));
     const denom = expVals.reduce((s, v) => s + v, 0) || 1;
     const probs = expVals.map(v => v / denom);
+
     // Update make-it-back probabilities for these players
-    for (let j = 0; j < indices.length; j++) {
-      const idx = indices[j];
-      const name = names[idx];
+    for (let j = 0; j < candidates.length; j++) {
+      const name = names[j];
       const pPick = probs[j];
       out[name] = out[name] * (1 - pPick);
     }
