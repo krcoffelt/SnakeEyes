@@ -2,193 +2,189 @@
 
 import React from 'react';
 import { useDraftStore } from '../store/draftStore';
-import { TrendingUp, AlertTriangle, Clock, Target } from 'lucide-react';
+import { TrendingUp, Target, Users, Trophy } from 'lucide-react';
 
 export default function LiveRecommendations() {
-  const { remaining, PPS, PVI, myRoster, config, weights, tierMetrics, scarcityMetrics } = useDraftStore();
-  
-  // Get top recommendations by PPS
-  const topRecommendations = remaining
-    .map(player => ({
-      ...player,
-      pps: PPS[player.player] || 0
-    }))
-    .sort((a, b) => b.pps - a.pps)
-    .slice(0, 8);
-  
-  const getPositionColor = (pos: string) => {
-    switch (pos) {
-      case 'QB': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200';
-      case 'RB': return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200';
-      case 'WR': return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200';
-      case 'TE': return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200';
-      case 'DEF': return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200';
-      case 'K': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200';
-      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
-    }
+  const { 
+    remaining, 
+    config, 
+    draft, 
+    PPS, 
+    PVI, 
+    tierMetrics, 
+    rosterNeeds, 
+    flexPressure,
+    scarcityMetrics,
+    tierUrgency,
+    availabilityRisk
+  } = useDraftStore();
+
+  const getTopRecommendations = () => {
+    const playersWithPPS = remaining
+      .filter(player => PPS[player.player] !== undefined)
+      .map(player => ({
+        ...player,
+        pps: PPS[player.player] || 0
+      }))
+      .sort((a, b) => b.pps - a.pps)
+      .slice(0, 8);
+
+    return playersWithPPS;
   };
-  
+
   const getRecommendationReason = (player: any) => {
     const reasons = [];
     
-    // Check roster needs
-    if (player.pos === 'QB' && myRoster.QB < config.roster.QB) {
-      reasons.push('Need QB');
-    }
-    if (player.pos === 'RB' && myRoster.RB < config.roster.RB) {
-      reasons.push('Need RB');
-    }
-    if (player.pos === 'WR' && myRoster.WR < config.roster.WR) {
-      reasons.push('Need WR');
-    }
-    if (player.pos === 'TE' && myRoster.TE < config.roster.TE) {
-      reasons.push('Need TE');
+    if (rosterNeeds[player.pos]) {
+      reasons.push(`Need ${player.pos}`);
     }
     
-    // Check FLEX pressure
-    const flexDebt = Math.max(0, 6 - (myRoster.RB + myRoster.WR));
-    if ((player.pos === 'RB' || player.pos === 'WR') && flexDebt > 0) {
-      reasons.push('FLEX pressure');
+    if (tierUrgency[player.player]) {
+      reasons.push('Tier cliff');
     }
     
-    // Check tier urgency
-    if (player.tier && player.tier <= 2) {
-      reasons.push('Elite tier');
+    if (scarcityMetrics[player.pos]?.urgency > 0.7) {
+      reasons.push('Scarce position');
     }
     
-    // Check availability risk
-    if (player.slp_rank && player.slp_rank <= 50) {
-      reasons.push('High value');
+    if (availabilityRisk[player.player]?.takeNow) {
+      reasons.push('Take now');
     }
     
-    return reasons.length > 0 ? reasons.join(' • ') : 'Best available';
+    return reasons.slice(0, 2).join(' • ') || 'Good value';
   };
-  
-  const getPriorityLevel = (pps: number) => {
-    if (pps >= 0.8) return { color: 'text-red-600 dark:text-red-400', icon: AlertTriangle, label: 'Take Now' };
-    if (pps >= 0.6) return { color: 'text-orange-600 dark:text-orange-400', icon: Clock, label: 'Consider' };
-    return { color: 'text-green-600 dark:text-green-400', icon: Target, label: 'Good Value' };
+
+  const getPriorityLevel = (player: any) => {
+    const pps = PPS[player.player] || 0;
+    if (pps > 0.8) return { level: 'Take Now', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200' };
+    if (pps > 0.6) return { level: 'Consider', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200' };
+    return { level: 'Good Value', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' };
   };
-  
+
+  const topRecommendations = getTopRecommendations();
+  const remainingRookies = remaining.filter(p => p.isRookie);
+  const top50Rookies = remainingRookies.filter(p => (PPS[p.player] || 0) > 0.5).length;
+
   return (
-    <div className="sleeper-card p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
-        <div className="w-6 h-6 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mr-3">
-          <TrendingUp className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-        </div>
-        Live Recommendations
-      </h2>
-      
+    <div className="space-y-6">
       {/* PVI Summary */}
-      <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Positional Value Index</h3>
-        <div className="space-y-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <div className="w-5 h-5 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mr-3">
+            <TrendingUp className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+          </div>
+          Positional Value
+        </h3>
+        
+        <div className="space-y-3">
           {Object.entries(PVI)
-            .sort(([, a], [, b]) => (b as number) - (a as number))
+            .sort(([,a], [,b]) => b - a)
             .map(([pos, value]) => (
               <div key={pos} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{pos}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{pos}</span>
                 <div className="flex items-center space-x-2">
-                  <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div 
-                      className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${(value as number) * 100}%` }}
-                    ></div>
+                      className="bg-purple-500 h-2 rounded-full transition-all"
+                      style={{ width: `${value * 100}%` }}
+                    />
                   </div>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {(value as number).toFixed(2)}
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {value.toFixed(2)}
                   </span>
                 </div>
               </div>
             ))}
         </div>
       </div>
-      
-      {/* Rookie Summary */}
-      <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
-        <h3 className="text-sm font-medium text-green-700 dark:text-green-300 mb-3">2025 Rookies</h3>
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <span className="font-medium text-green-600 dark:text-green-400">
-              {remaining.filter(p => p.isRookie).length}
-            </span>
-            <span className="text-green-600 dark:text-green-400"> remaining</span>
-          </div>
-          <div>
-            <span className="font-medium text-green-600 dark:text-green-400">
-              {remaining.filter(p => p.isRookie && p.slp_rank && p.slp_rank <= 50).length}
-            </span>
-            <span className="text-green-600 dark:text-green-400"> top 50</span>
-          </div>
-        </div>
-        <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-          Rookies get +8% PPS boost for upside potential
-        </p>
-      </div>
-      
+
       {/* Top Recommendations */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Top Picks</h3>
-        {topRecommendations.map((player, index) => {
-          const priority = getPriorityLevel(player.pps);
-          const PriorityIcon = priority.icon;
-          
-          return (
-            <div
-              key={player.player}
-              className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">
-                    {index + 1}. {player.player}
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <div className="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
+            <Target className="h-3 w-3 text-green-600 dark:text-green-400" />
+          </div>
+          Top Picks
+        </h3>
+        
+        <div className="space-y-3">
+          {topRecommendations.map((player, index) => {
+            const priority = getPriorityLevel(player);
+            const reason = getRecommendationReason(player);
+            
+            return (
+              <div key={player.player} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 dark:text-white text-sm">
+                      {player.player}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {player.pos} • {player.team || '-'}
+                      {player.isRookie && (
+                        <span className="ml-1 inline-flex items-center px-1 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                          R
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {player.pos} • {player.team} • Und: {player.und_rank} • SLP: {player.slp_rank}
-                    {player.bye && ` • BYE: ${player.bye}`}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className={`text-xs px-2 py-1 rounded-full ${getPositionColor(player.pos)}`}>
-                    {player.pos}
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${priority.color}`}>
+                    {priority.level}
                   </span>
-                  {player.isRookie && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
-                      R
-                    </span>
-                  )}
-                  <div className={`flex items-center space-x-1 ${priority.color}`}>
-                    <PriorityIcon className="h-3 w-3" />
-                    <span className="text-xs font-medium">{priority.label}</span>
+                </div>
+                
+                <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  {reason}
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    PPS: {(player.pps * 100).toFixed(0)}
+                  </span>
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => {
+                        const currentPick = remaining.length + 1;
+                        const round = Math.ceil(currentPick / config.teams);
+                        const pick = ((currentPick - 1) % config.teams) + 1;
+                        draft(player.player, round, pick, 'me');
+                      }}
+                      className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
+                      title="Draft for me"
+                    >
+                      <Users className="h-3 w-3" />
+                    </button>
                   </div>
                 </div>
               </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  {getRecommendationReason(player)}
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                    PPS: {player.pps.toFixed(2)}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Tier: {player.tier || 'N/A'}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-      
-      {/* Quick Actions */}
-      <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-        <h3 className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-2">Quick Actions</h3>
-        <div className="text-xs text-purple-600 dark:text-purple-400 space-y-1">
-          <div>• Click player cards to draft</div>
-          <div>• Use search for specific players</div>
-          <div>• Adjust weights to change recommendations</div>
+
+      {/* Rookie Summary */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <div className="w-5 h-5 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mr-3">
+            <Trophy className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />
+          </div>
+          2025 Rookies
+        </h3>
+        
+        <div className="space-y-3">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+              {remainingRookies.length}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Remaining</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-lg font-semibold text-green-600 dark:text-green-400">
+              {top50Rookies}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Top 50 Value</div>
+          </div>
         </div>
       </div>
     </div>

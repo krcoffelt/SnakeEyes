@@ -94,11 +94,14 @@ export default function DraftPage() {
           {/* Draft Board - Full Width at Top */}
           <DraftBoard />
           
-          {/* Player Search and Table - Full Width Below */}
-          <PlayerSearch />
-          
-          {/* Recommendations Panel - Right Side */}
+          {/* Player Table and Recommendations - Side by Side */}
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            {/* Player Search and Table - Left Side (3/4 width) */}
+            <div className="xl:col-span-3">
+              <PlayerSearch />
+            </div>
+            
+            {/* Live Recommendations - Right Sidebar (1/4 width) */}
             <div className="xl:col-span-1">
               <LiveRecommendations />
             </div>
