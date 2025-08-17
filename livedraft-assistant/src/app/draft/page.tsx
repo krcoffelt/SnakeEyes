@@ -12,7 +12,14 @@ import { ArrowLeft, Settings } from 'lucide-react';
 
 export default function DraftPage() {
   const router = useRouter();
-  const { loadData, config, loading, error, clearError } = useDraftStore();
+  const { loadData, config, loading, error, clearError, resetDraft } = useDraftStore(s => ({
+    loadData: s.loadData,
+    config: s.config,
+    loading: s.loading,
+    error: s.error,
+    clearError: s.clearError,
+    resetDraft: s.resetDraft
+  }), (a, b) => a.config === b.config && a.loading === b.loading && a.error === b.error);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
@@ -62,7 +69,7 @@ export default function DraftPage() {
               <button onClick={toggleTheme} className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                 {theme === 'dark' ? '☀️' : '🌙'}
               </button>
-              <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
+              <button onClick={() => resetDraft()} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
                 Reset Draft
               </button>
             </div>

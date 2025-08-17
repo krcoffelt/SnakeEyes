@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDraftStore } from '../store/draftStore';
+import shallow from 'zustand/shallow';
 import { Grid, Clock, User, Users, Undo2, RotateCcw, ChevronUp, ChevronDown, Circle } from 'lucide-react';
 
 export default function DraftBoard() {
-  const { draftBoard, config, drafted, undo, resetDraft } = useDraftStore();
+  const { draftBoard, config, drafted, undo, resetDraft } = useDraftStore(
+    s => ({ draftBoard: s.draftBoard, config: s.config, drafted: s.drafted, undo: s.undo, resetDraft: s.resetDraft }),
+    shallow
+  );
   const [visibleRounds, setVisibleRounds] = useState({ start: 1, end: 5 });
-  
-  // Debug logging
-  console.log('DraftBoard render:', { draftBoard, drafted: drafted.length });
   
   const maxRounds = 15; // Maximum rounds to display
   const teams = config.teams;
@@ -26,6 +27,8 @@ export default function DraftBoard() {
       default: return 'from-gray-200 to-gray-300 text-gray-800 dark:from-gray-700 dark:to-gray-600 dark:text-white';
     }
   };
+
+  const gridStyle = useMemo(() => ({ gridTemplateColumns: `80px repeat(${teams}, 96px)` }), [teams]);
   
   const getDraftDirection = (round: number) => {
     return round % 2 === 1 ? 'left-to-right' : 'right-to-left';
@@ -155,9 +158,9 @@ export default function DraftBoard() {
             </div>
           </div>
         </div>
-        
+
         {/* Team header chips */}
-        <div className="grid grid-cols-21 gap-1 mb-2">
+        <div className="grid gap-1 mb-2" style={gridStyle}>
           <div className="w-20" />
           {Array.from({ length: teams }, (_, i) => i + 1).map(teamNum => (
             <div key={teamNum} className="w-24 flex items-center justify-center">
@@ -189,18 +192,15 @@ export default function DraftBoard() {
         {/* Draft Board Grid - Scrollable */}
         <div className="overflow-x-auto">
           <div className="min-w-max">
-            {/* Draft Rows - Only Show Visible Rounds */}
             {Array.from({ length: roundsToShow }, (_, index) => {
               const round = visibleRounds.start + index;
               if (round > maxRounds) return null;
               const direction = getDraftDirection(round);
               return (
-                <div key={round} className="grid grid-cols-21 gap-1 mb-1">
-                  {/* Round Label */}
+                <div key={round} className="grid gap-1 mb-1" style={gridStyle}>
                   <div className="w-20 text-sm font-medium text-gray-700 dark:text-gray-300 text-center py-2">
                     {round}
                   </div>
-                  {/* Team Picks */}
                   {Array.from({ length: teams }, (_, pickIndex) => {
                     const pick = direction === 'left-to-right' ? pickIndex + 1 : teams - pickIndex;
                     const draftedPlayer = draftBoard[round]?.[pick];
@@ -255,7 +255,7 @@ export default function DraftBoard() {
             })}
           </div>
         </div>
-        
+
         {/* Draft Summary */}
         <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div className="grid grid-cols-2 gap-4 text-center">

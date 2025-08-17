@@ -1,8 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDraftStore } from '../store/draftStore';
 import { Search, Filter, User, Users, ChevronUp, ChevronDown, Plus } from 'lucide-react';
+import { Player } from '../lib/types';
+
+// simple debounce hook
+function useDebounced<T>(value: T, delay = 200): T {
+  const [v, setV] = useState(value);
+  React.useEffect(() => {
+    const t = setTimeout(() => setV(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return v;
+}
 
 export default function PlayerSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,69 +29,43 @@ export default function PlayerSearch() {
   const [visiblePlayers, setVisiblePlayers] = useState({ start: 0, end: 10 });
   
   const { remaining, config, draft } = useDraftStore();
+  const debouncedSearch = useDebounced(searchTerm, 200);
   
   const positions = ['QB', 'RB', 'WR', 'TE', 'DEF', 'K'];
   const playersToShow = 10; // Number of players visible at once
   
-  const filteredPlayers = remaining.filter(player => {
-    const matchesSearch = player.player.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPosition = !selectedPosition || player.pos === selectedPosition;
-    const matchesRookie = !showRookiesOnly || player.isRookie;
-    return matchesSearch && matchesPosition && matchesRookie;
-  }).slice(0, 20); // Limit to top 20 results for search
+  const filteredPlayers = useMemo(() => {
+    return remaining.filter(player => {
+      const matchesSearch = player.player.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const matchesPosition = !selectedPosition || player.pos === selectedPosition;
+      const matchesRookie = !showRookiesOnly || player.isRookie;
+      return matchesSearch && matchesPosition && matchesRookie;
+    }).slice(0, 20);
+  }, [remaining, debouncedSearch, selectedPosition, showRookiesOnly]);
   
-  // Sort function for the main table
-  const getSortedPlayers = () => {
+  const sortedPlayersMemo = useMemo<Player[]>(() => {
     let sorted = [...remaining];
-    
-    // Apply filters
-    if (selectedPosition) {
-      sorted = sorted.filter(player => player.pos === selectedPosition);
-    }
-    if (showRookiesOnly) {
-      sorted = sorted.filter(player => player.isRookie);
-    }
-    if (searchTerm) {
-      sorted = sorted.filter(player => 
-        player.player.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Sort
+    if (selectedPosition) sorted = sorted.filter(player => player.pos === selectedPosition);
+    if (showRookiesOnly) sorted = sorted.filter(player => player.isRookie);
+    if (debouncedSearch) sorted = sorted.filter(player => player.player.toLowerCase().includes(debouncedSearch.toLowerCase()));
     sorted.sort((a, b) => {
       let aValue: number, bValue: number;
-      
       switch (sortBy) {
-        case 'rank':
-          aValue = a.und_rank || 999;
-          bValue = b.und_rank || 999;
-          break;
-        case 'und_adp':
-          aValue = a.und_adp || 999;
-          bValue = b.und_adp || 999;
-          break;
-        case 'slp_rank':
-          aValue = a.slp_rank || 999;
-          bValue = b.slp_rank || 999;
-          break;
-        case 'value':
-          aValue = a.value || 0;
-          bValue = b.value || 0;
-          break;
-        default:
-          aValue = a.und_rank || 999;
-          bValue = b.und_rank || 999;
+        case 'rank': aValue = a.und_rank || 999; bValue = b.und_rank || 999; break;
+        case 'und_adp': aValue = a.und_adp || 999; bValue = b.und_adp || 999; break;
+        case 'slp_rank': aValue = a.slp_rank || 999; bValue = b.slp_rank || 999; break;
+        case 'value': aValue = a.value || 0; bValue = b.value || 0; break;
+        default: aValue = a.und_rank || 999; bValue = b.und_rank || 999;
       }
-      
-      if (sortDirection === 'asc') {
-        return aValue - bValue;
-      } else {
-        return bValue - aValue;
-      }
+      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     });
-    
     return sorted;
-  };
+  }, [remaining, selectedPosition, showRookiesOnly, debouncedSearch, sortBy, sortDirection]);
+
+  const canScrollUp = visiblePlayers.start > 0;
+  const sortedPlayers = sortedPlayersMemo;
+  const canScrollDown = visiblePlayers.end < sortedPlayers.length;
+  const visiblePlayerSet = sortedPlayers.slice(visiblePlayers.start, visiblePlayers.end);
   
   const handleSort = (column: 'rank' | 'und_adp' | 'slp_rank' | 'value') => {
     if (sortBy === column) {
@@ -101,17 +86,12 @@ export default function PlayerSearch() {
   };
   
   const scrollDown = () => {
-    const sortedPlayers = getSortedPlayers();
+    const sortedPlayers = sortedPlayersMemo;
     setVisiblePlayers(prev => ({
       start: Math.min(sortedPlayers.length - playersToShow, prev.start + playersToShow),
       end: Math.min(sortedPlayers.length, prev.end + playersToShow)
     }));
   };
-  
-  const canScrollUp = visiblePlayers.start > 0;
-  const sortedPlayers = getSortedPlayers();
-  const canScrollDown = visiblePlayers.end < sortedPlayers.length;
-  const visiblePlayerSet = sortedPlayers.slice(visiblePlayers.start, visiblePlayers.end);
   
   const handleDraft = () => {
     if (selectedPlayer) {
