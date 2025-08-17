@@ -363,13 +363,13 @@ function computeOpponentMakeItBack(
     }
   });
 
-  // Determine intervening team slots between now and next user pick
-  const interveningTeams: number[] = [];
+  // Determine intervening team slots and their pick overall between now and next user pick
+  const intervening: Array<{ teamSlot: number; ovPick: number }> = [];
   for (let ov = start; ov <= end; ov++) {
     const { round, pickInRound } = getRoundAndPick(ov, teams);
     const isOdd = round % 2 === 1;
     const col = isOdd ? pickInRound : (teams - pickInRound + 1);
-    if (col !== userSlot) interveningTeams.push(col);
+    if (col !== userSlot) intervening.push({ teamSlot: col, ovPick: ov });
   }
 
   const out: { [name: string]: number } = {};
@@ -379,34 +379,42 @@ function computeOpponentMakeItBack(
   const posUrgency: Record<string, number> = {};
   Object.keys(scarcity).forEach(pos => { posUrgency[pos] = scarcity[pos]?.urgency ?? 0; });
 
-  // For each intervening team, compute a softmax over candidate players
-  const tau = 0.4; // temperature
-  interveningTeams.forEach(teamSlot => {
+  const tau = 0.4; // softmax temperature
+  const adpWeight = 0.8; // strong influence from Sleeper ADP
+  const sAdp = Math.max(4, Math.round(teams / 2));
+
+  // For each intervening team, compute a softmax over candidate players emphasizing Sleeper ADP proximity
+  intervening.forEach(({ teamSlot, ovPick }) => {
     const { rosterNeeds: needs } = computeRosterNeeds(rosters[teamSlot], { flexCount: config.flexCount, ppr: config.ppr });
-    // Build scores for candidates
     const scores: number[] = [];
     const names: string[] = [];
-    const positions: (string | undefined)[] = [];
+
     for (let i = 0; i < remaining.length; i++) {
       const p = remaining[i];
       const pos = p.pos || '';
       names.push(p.player);
-      positions.push(pos);
       const mv = marketValues[p.player] || 0;
       const tu = tierUrgency[p.player] || 0;
       const sc = pos ? (posUrgency[pos] || 0) : 0;
       const need = pos ? (needs[pos] || 0) : 0;
+      const adpRef = (p.slp_rank != null ? p.slp_rank : (p.und_adp != null ? p.und_adp : (p.ron_rank != null ? p.ron_rank : null)));
+      const adpSig = adpRef != null ? (1 / (1 + Math.exp(-(ovPick - adpRef) / sAdp))) : 0.5;
       let score = 0;
+      // Core drivers
       score += weights.w_value * mv;
       score += weights.w_tier * tu;
       score += weights.w_scar * sc;
       score += weights.w_need * need;
+      // Strong Sleeper ADP term
+      score += adpWeight * adpSig;
+      // Light global boosts
       if (config.ppr === 'PPR' && (pos === 'WR' || pos === 'TE')) score += 0.04;
       else if (config.ppr === 'Half PPR' && (pos === 'WR' || pos === 'TE')) score += 0.02;
       if (pos === 'RB' || pos === 'WR') score += 0.02;
       if (p.isRookie) score += 0.03;
       scores.push(Math.max(0, score));
     }
+
     // Select top K for softmax to reduce noise
     const indices = scores.map((s, i) => [s, i] as [number, number]).sort((a, b) => b[0] - a[0]).slice(0, 40).map(pair => pair[1]);
     const expVals = indices.map(i => Math.exp(scores[i] / Math.max(0.001, tau)));
