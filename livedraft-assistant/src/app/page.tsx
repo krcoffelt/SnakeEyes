@@ -30,20 +30,9 @@ export default function LeagueSetup() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: 'transparent' }}>
-      {/* Image Background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'url("https://github.com/krcoffelt/SnakeEyes/blob/main/public/images/magicpattern-iAR6yhCkrxc-unsplash.jpg?raw=true")',
-        }}
-      ></div>
-      
-      {/* Subtle overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/20"></div>
-      
+    <div className="min-h-screen relative overflow-hidden bg-black">
       {/* Content */}
-      <div className="relative z-10 flex items-center justify-center p-4 min-h-screen">
+      <div className="flex items-center justify-center p-4 min-h-screen">
         <div className="max-w-2xl w-full">
           {/* Header */}
           <div className="text-center mb-12">
