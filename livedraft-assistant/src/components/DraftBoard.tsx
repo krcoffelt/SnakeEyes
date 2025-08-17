@@ -38,15 +38,17 @@ export default function DraftBoard() {
     return { round, pick };
   };
   
-  // Function to abbreviate player names (First name + Last initial)
+  // Function to abbreviate: First initial + Last name (e.g., "J. Chase")
   const getAbbreviatedName = (fullName: string) => {
-    const nameParts = fullName.trim().split(' ');
-    if (nameParts.length >= 2) {
-      const firstName = nameParts[0];
-      const lastName = nameParts[nameParts.length - 1];
-      return `${firstName} ${lastName.charAt(0)}.`;
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0];
+    const suffixes = new Set(['Jr.', 'Jr', 'Sr.', 'Sr', 'II', 'III', 'IV', 'V']);
+    let last = parts[parts.length - 1];
+    if (suffixes.has(last) && parts.length >= 2) {
+      last = parts[parts.length - 2];
     }
-    return fullName; // Fallback for single names
+    const firstInitial = parts[0].charAt(0);
+    return `${firstInitial}. ${last}`;
   };
   
   const { round: currentRound, pick: currentPick } = getCurrentPick();
@@ -227,8 +229,8 @@ export default function DraftBoard() {
                         {draftedPlayer ? (
                           <div className="p-2 h-full flex flex-col justify-between">
                             {/* Player Name - Main Display */}
-                            <div className="text-xs font-medium text-gray-900 dark:text-white truncate text-center">
-                              {getAbbreviatedName(draftedPlayer.player)}
+                            <div className="text-xs font-semibold text-gray-900 dark:text-white truncate text-center">
+                              {draftedPlayer.player ? getAbbreviatedName(draftedPlayer.player) : '—'}
                             </div>
                             
                             {/* Position and Team - Secondary Info */}
