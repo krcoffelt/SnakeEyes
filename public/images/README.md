@@ -1,5 +1,16 @@
 # Background Images
 
+## SnakeEyes Logo
+The main logo for the Draft Value Assistant:
+
+1. Save your logo as `SnakeEyes.png` in this folder
+2. The logo should be:
+   - PNG format for transparency support
+   - High resolution (at least 200x200px)
+   - Named exactly: `SnakeEyes.png`
+
+The logo will automatically replace the text heading on the Draft Setup Page.
+
 ## Fiery Gradient Background
 To use the fiery gradient background image:
 
@@ -12,12 +23,13 @@ To use the fiery gradient background image:
 The image will automatically be used as the background for the Draft Setup Page.
 
 ## Image Specifications
-- **Format**: WebP (recommended) or JPG/JPEG
-- **Dimensions**: 1920x1080 or higher
-- **File Name**: `fiery-gradient-background.webp`
-- **Location**: `/public/images/fiery-gradient-background.webp`
+- **Logo**: PNG format (200x200px or higher)
+- **Background**: WebP (recommended) or JPG/JPEG
+- **Dimensions**: Logo: 200x200px+, Background: 1920x1080+
+- **File Names**: `SnakeEyes.png`, `fiery-gradient-background.webp`
+- **Location**: `/public/images/`
 
-## Why WebP?
+## Why WebP for Background?
 - **Smaller file size** (25-35% smaller than JPG)
 - **Better quality** at smaller sizes
 - **Modern format** with excellent browser support
