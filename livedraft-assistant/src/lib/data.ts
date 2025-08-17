@@ -110,18 +110,33 @@ export async function loadRon(): Promise<RonRecord[]> {
   const data = await fetchCsv<CSVData>('/data/Ron_Rankings.csv');
   const rows = data
     .map(row => {
-      const tierRaw = String(row['Value Tiers'] || row['Tier'] || '').trim();
-      if (!tierRaw) {
-        // skip invalid header/blank rows
-        if (!row['Name'] && !row['Rank']) return null;
-      }
-      const name = String(row['Name'] || row['name'] || '').trim();
+      const keys = Object.keys(row);
+      const normKey = (k: string) => k.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const findKey = (preds: string[]): string | undefined => {
+        // exact first, then contains
+        const exact = keys.find(k => preds.includes(normKey(k)));
+        if (exact) return exact;
+        return keys.find(k => preds.some(p => normKey(k).includes(p)));
+      };
+
+      const tierKey = findKey(['valuetiers', 'tier']);
+      const nameKey = findKey(['name', 'player']);
+      const rankKey = findKey(['rank']);
+      const posKey = findKey(['pos']);
+      const posRankKey = findKey(['posrk', 'posrank']);
+      const idKey = findKey(['id']);
+      const targetKey = findKey(['targetround', 'targetrnd', 'target']);
+
+      const tierRaw = String((tierKey ? row[tierKey] : '') || '').trim();
+      if (!tierRaw && !nameKey && !rankKey) return null;
+
+      const name = String((nameKey ? row[nameKey] : '') || '').trim();
       if (!name) return null;
-      const rank = safeParseNumber(row['Rank']);
-      const pos = String(row['Pos.'] || row['Pos'] || row['Position'] || '').trim();
-      const posRank = safeParseNumber(row['Pos Rk'] || row['Pos Rank'] || row['PosRk']);
-      const id = String(row['id'] || row['Id'] || row['ID'] || '').trim();
-      const targetRound = safeParseNumber(row['Target Round'] || row['TargetRound']);
+      const rank = safeParseNumber(rankKey ? row[rankKey] : undefined);
+      const pos = String((posKey ? row[posKey] : '') || '').trim();
+      const posRank = safeParseNumber(posRankKey ? row[posRankKey] : undefined);
+      const id = String((idKey ? row[idKey] : '') || '').trim();
+      const targetRound = safeParseNumber(targetKey ? row[targetKey] : undefined);
       const tierNumMatch = tierRaw.match(/tier\s*(\d+)/i);
       const ron_tier = tierNumMatch ? Number(tierNumMatch[1]) : null;
       const rec: RonRecord = {
