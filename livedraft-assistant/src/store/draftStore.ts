@@ -299,14 +299,30 @@ export const useDraftStore = create<DraftStore>()(
       },
 
       resetDraft: () => {
+        const currentState = get();
+        const playersToRestore = currentState.players.length > 0 ? currentState.players : currentState.remaining;
+        
         set({
           drafted: [],
-          remaining: get().players,
+          remaining: playersToRestore,
           draftBoard: {},
           draftState: defaultDraftState,
-          myRoster: { QB: 0, RB: 0, WR: 0, TE: 0, DEF: 0, K: 0, total: 0 }
+          myRoster: { QB: 0, RB: 0, WR: 0, TE: 0, DEF: 0, K: 0, total: 0 },
+          // Reset all computed values
+          PPS: {},
+          PVI: {},
+          tierMetrics: { gapToNextTier: [], lastInTierFlags: [] },
+          rosterNeeds: {},
+          flexPressure: 0,
+          scarcityMetrics: {},
+          tierUrgency: {},
+          availabilityRisk: {}
         });
-        get().recompute();
+        
+        // Only recompute if we have players to work with
+        if (playersToRestore.length > 0) {
+          get().recompute();
+        }
       },
 
       updateConfig: (newConfig) => {

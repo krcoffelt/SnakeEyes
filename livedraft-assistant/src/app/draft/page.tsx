@@ -12,7 +12,7 @@ import { ArrowLeft, Settings } from 'lucide-react';
 
 export default function DraftPage() {
   const router = useRouter();
-  const { loadData, config } = useDraftStore();
+  const { loadData, config, resetDraft } = useDraftStore();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
@@ -28,6 +28,7 @@ export default function DraftPage() {
 
   const toggleTheme = () => { setTheme(prev => prev === 'light' ? 'dark' : 'light'); };
   const goBackToSetup = () => { router.push('/'); };
+  const handleResetDraft = () => { resetDraft(); };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -54,7 +55,7 @@ export default function DraftPage() {
               <button onClick={toggleTheme} className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                 {theme === 'dark' ? '☀️' : '🌙'}
               </button>
-              <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
+              <button onClick={handleResetDraft} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
                 Reset Draft
               </button>
             </div>
