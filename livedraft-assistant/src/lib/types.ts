@@ -4,12 +4,18 @@ export type Player = {
   team?: string;
   bye?: number | null;        // BYE week
   isRookie?: boolean;         // 2025 rookie status
+  und_id?: string;            // Underdog player Id (for reliable joins)
+  ron_id?: string | null;     // Ron-provided id (should match Underdog Id when available)
   und_rank?: number | null;
   und_adp?: number | null;
   slp_rank?: number | null;
+  ron_rank?: number | null;   // Ron ADP (overall rank)
+  ron_pos_rank?: number | null; // Ron positional rank
+  ron_tier?: number | null;   // Ron-provided tier number
+  ron_target_round_12?: number | null; // Ron target round for 12-team leagues
   value?: number | null;      // SLP - Und
   blend_rank?: number | null; // 0.6*Und + 0.4*SLP (configurable)
-  tier?: number | null;       // computed tier index within position (1 = elite)
+  tier?: number | null;       // computed/preferred tier index within position (1 = elite)
 };
 
 export type Weights = {

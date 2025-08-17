@@ -1,1 +1,202 @@
-Name,Team,BYE,Pos,Ron Rank 
+,,,,,,,
+Value Tiers,Rank,Name,id,Pos.,Pos Rk,,Target Round
+Tier 1,1,Ja'Marr Chase,b24eb93f-72bd-4c23-bed6-807d542bab65,WR,1,,1
+Tier 2,2,Jahmyr Gibbs,0ec23474-d4b8-4dcd-9157-b6de1fb8ff84,RB,1,,1
+Tier 2,3,Bijan Robinson,b42031b0-6abb-4621-90c0-e3f8041f6c9d,RB,2,,1
+Tier 2,4,CeeDee Lamb,1b76bd49-ac28-457e-96a6-4b2135c9ff73,WR,2,,1
+Tier 2,5,Saquon Barkley,1dad2b6f-6089-4844-8319-6f1eb23b5003,RB,3,,1
+Tier 2,6,Justin Jefferson,fb2b25a4-b791-4ef0-bc45-41099b503a69,WR,3,,1
+Tier 2,7,Christian McCaffrey,baefa551-0611-4836-b43a-1d6c105211b7,RB,4,,1
+Tier 3,8,De'Von Achane,9a97b0b2-fda2-4d87-8392-50b32ea6fcd3,RB,5,,1
+Tier 3,9,Puka Nacua,827b3a04-55f4-4c0e-940f-62be3233dd15,WR,4,,1
+Tier 3,10,Nico Collins,13c991e1-747d-4cbd-9bdb-a5e017bdb77b,WR,5,,1
+Tier 3,11,Amon-Ra St. Brown,3ee87ad4-537e-46ac-8cf4-d2bf5f8540ed,WR,7,,1
+Tier 3,12,Malik Nabers,c2ff3b1f-dbc0-4314-986a-3a2c1dc5bf50,WR,6,,1
+Tier 3,13,Brian Thomas Jr.,6d89c0c5-4756-43ab-b80f-70fc83e5efa8,WR,8,,2
+Tier 3,14,Ashton Jeanty,8f217c44-cc37-44a8-84f9-d82cd3fe91ff,RB,6,,2
+Tier 4,15,A.J. Brown,2eb19695-162b-4d6f-970d-266b3513ddbd,WR,9,,2
+Tier 4,16,Drake London,0fd6a099-0696-4aeb-b7c8-bf3c5280db0f,WR,10,,2
+Tier 4,17,Derrick Henry,9b791eb1-eb3f-4216-87c5-a381fd694aff,RB,7,,2
+Tier 4,18,Brock Bowers,d98df6de-a814-477a-bd9b-b6a747f32ab4,TE,1,,2
+Tier 4,19,Bucky Irving,1bc16f8e-964e-4946-b3da-bd7b7fe8731e,RB,8,,2
+Tier 4,20,Chase Brown,221733f8-7235-4b9e-a2cd-45dad292e33b,RB,9,,2
+Tier 4,21,Jonathan Taylor,a93a8358-f3eb-4a07-9a85-a13a0b2427a2,RB,10,,2
+Tier 4,22,Ladd McConkey,f41070b3-c28d-4cff-afb4-6bae844edabf,WR,11,,2
+Tier 4,23,Josh Jacobs,9ecd270d-e314-466e-8cff-126385d8a9e9,RB,11,,2
+Tier 4,24,Trey McBride,d6c8b5b5-c01a-43d4-84b5-cbad5e4a7f21,TE,2,,3
+Tier 4,25,Tee Higgins,43973f1b-ff52-44cd-a5d1-43426587f368,WR,12,,3
+Tier 4,26,Lamar Jackson,c3c29d05-6c66-4726-b2b3-01f5323a8087,QB,1,,3
+Tier 4,27,Josh Allen,0467ab97-0708-4a95-88ef-124455ac4ac1,QB,2,,3
+Tier 5,28,Tyreek Hill,d8aca1d5-8318-4ada-9cf1-18ef1b60b464,WR,13,,3
+Tier 5,29,Omarion Hampton,fd373123-6fc9-4e2c-829c-9879ae96caea,RB,12,,3
+Tier 5,30,James Cook,cf7f210d-aa77-4481-a6ce-def8eb13c4a7,RB,13,,3
+Tier 5,31,Kenneth Walker III,ffbb0124-5050-4795-b305-591cb44a8490,RB,14,,4
+Tier 5,32,Kyren Williams,48699f93-77e6-48ee-93cc-df880846796f,RB,15,,3
+Tier 5,33,Jalen Hurts,a547b04a-38e6-435e-9f9d-81a34e7aac6c,QB,3,,3
+Tier 5,34,Jayden Daniels,09d74295-61f2-4824-b49b-f1c677be0763,QB,4,,3
+Tier 5,35,George Kittle,6d78912a-4699-4228-9e18-621c213202a7,TE,3,,3
+Tier 6,36,Davante Adams,3bca74ae-aea9-4b96-9cfa-ba6320a9dca6,WR,14,,4
+Tier 6,37,TreVeyon Henderson,e04ddd15-a5ab-41e8-82b2-3dfc90a2c893,RB,16,,4
+Tier 6,38,Garrett Wilson,146fb59c-b8ff-414a-86a7-3c2e612a81c0,WR,15,,4
+Tier 6,39,Jaxon Smith-Njigba,e92d0ab0-3f60-456a-a57f-b689b8107c7a,WR,16,,4
+Tier 6,40,Mike Evans,c72e9110-c8be-4bcf-a567-d78c9f3073d1,WR,17,,4
+Tier 6,41,Terry McLaurin,bdbd91c4-8792-4056-a4b1-dabc074aa580,WR,18,,4
+Tier 6,42,Tetairoa McMillan,c00d3668-c5ca-41be-bbb3-30e421920276,WR,19,,5
+Tier 6,43,George Pickens,7db4138f-109b-4b32-8c1b-cd51a4c12d1f,WR,20,,5
+Tier 6,44,Marvin Harrison Jr.,799eb40c-a66a-4fd8-a8e3-186fc3f20ccb,WR,21,,4
+Tier 6,45,Xavier Worthy,4122e07d-fe79-4816-9292-4f6a94b00cbc,WR,22,,5
+Tier 6,46,Breece Hall,0f31f57a-5461-4802-811e-f84fde65f9b5,RB,17,,4
+Tier 6,47,RJ Harvey,fbc4cce8-3964-402c-a0a6-dbe13b5ebd86,RB,18,,5
+Tier 6,48,Travis Hunter,d8c923f8-3ccf-49c2-895a-c58ad280c088,WR,23,,5
+Tier 6,49,James Conner,c43f5ce9-2f01-49df-83cb-c198ca9c49c8,RB,19,,5
+Tier 6,50,Alvin Kamara,d2928ec9-ae89-4894-aded-09b6602cf28e,RB,20,,5
+Tier 6,51,Zay Flowers,655f249b-461d-426c-97c7-efc20870c660,WR,24,,5
+Tier 6,52,Jameson Williams,c3a3bd66-d55d-44f7-98f6-78450678fa87,WR,25,,5
+Tier 6,53,Jaylen Waddle,506c6382-05b9-4090-ada6-aa977ab6afca,WR,26,,5
+Tier 6,54,DeVonta Smith,4bb0512e-9cfd-430d-9742-1fff9f043b18,WR,27,,5
+Tier 6,55,DJ Moore,47f49002-0e7d-4f51-9a15-525ef6397fde,WR,28,,5
+Tier 6,56,DK Metcalf,30669c4d-f918-49b2-9f5b-8bd47016d097,WR,29,,5
+Tier 6,57,Chuba Hubbard,a8c3cb2b-7728-4ee0-8f89-f218e5e0c409,RB,21,,5
+Tier 6,58,Courtland Sutton,7601e2e8-add1-4c8c-b169-b63a49fdf57b,WR,30,,6
+Tier 6,59,Calvin Ridley,2c4e3e6e-667c-44c3-8083-bfd11b1fd7a8,WR,31,,6
+Tier 6,60,Rashee Rice,f1e0fe78-af51-4e41-9f58-a8146a69c5a9,WR,32,,6
+Tier 6,61,Joe Burrow,08681b3b-8775-4637-84fa-e23da96e59f6,QB,5,,5
+Tier 7,62,Rome Odunze,be004901-0a0f-41cd-ab83-c0d8d7ad916d,WR,33,,7
+Tier 7,63,Chris Olave,1b2c7c20-e458-454d-be39-7aaebabf1e30,WR,34,,7
+Tier 7,64,David Montgomery,e4bcd565-12d4-4b4c-91b1-1b72541b24e2,RB,22,,6
+Tier 7,65,Aaron Jones Sr.,f50101bc-fbfa-4a82-a625-c11c479cfbe8,RB,23,,6
+Tier 7,66,D'Andre Swift,94224657-62c9-4238-86f2-ba2c07ce0e4b,RB,24,,6
+Tier 7,67,Sam LaPorta,a259e591-fec1-4185-a0b2-43a434cc9f49,TE,4,,6
+Tier 7,68,Tony Pollard,5c510a1a-d9f3-47c5-8c7f-c9c7d0968dd5,RB,25,,6
+Tier 7,69,Jerry Jeudy,c34084aa-c044-4695-81ee-6328f98c591c,WR,35,,7
+Tier 7,70,Emeka Egbuka,a41974fe-71b2-408e-847d-86405b104654,WR,36,,7
+Tier 7,71,Matthew Golden,53ef4d2b-2f6f-4b63-b1bc-a76c109cf4c4,WR,37,,7
+Tier 7,72,Ricky Pearsall,812a947e-6ecc-43ce-9572-ac9da7cc4bcb,WR,38,,7
+Tier 7,73,Deebo Samuel Sr.,533aaf00-6105-4dc7-9e32-ee6e0e78a66a,WR,39,,7
+Tier 7,74,Stefon Diggs,e57459d1-a8ea-4e55-909d-06b378e09b02,WR,40,,7
+Tier 7,75,Isiah Pacheco,467dd20b-81e4-42a3-837a-ed937702925e,RB,26,,7
+Tier 7,76,Kaleb Johnson,ea213cff-af5a-4902-b17d-14591284ccac,RB,27,,7
+Tier 7,77,Jordan Addison,411b0cfe-9139-43a5-a95c-748758368d75,WR,41,,7
+Tier 7,78,Jauan Jennings,2d542871-3989-447d-89e6-9dcfbd6894e6,WR,42,,7
+Tier 7,79,Patrick Mahomes II,4808cc03-7e41-4c33-974f-a1701a98324c,QB,6,,7
+Tier 7,80,Jakobi Meyers,6d09867d-203b-4d91-975c-128125e7cf89,WR,43,,7
+Tier 7,81,Mark Andrews,f52f0cdf-de38-4cd9-a5c9-b54b2958ea05,TE,5,,7
+Tier 7,82,Travis Kelce,bbd7c5bc-808f-4c97-80e1-6029515ff8bc,TE,6,,7
+Tier 7,83,T.J. Hockenson,4ddaf397-6424-4910-b9ec-49aef1d2b69a,TE,7,,7
+Tier 7,84,Joe Mixon,9da4da3d-00e5-494d-9b92-dd875a92a9c1,RB,28,,7
+Tier 8,85,Brian Robinson Jr.,d163492c-f926-4cb9-96fc-b93759e92541,RB,29,,8
+Tier 8,86,Travis Etienne Jr.,fb9df616-a7a2-4339-ab1a-b3e5dfd2278b,RB,30,,8
+Tier 8,87,Tyrone Tracy Jr.,c8fd58f1-4635-46b0-9727-6cdd493a63a0,RB,31,,8
+Tier 8,88,Jayden Reed,f234f298-dc09-48a1-8198-168a9c25c28c,WR,44,,8
+Tier 8,89,Josh Downs,2965705e-121c-4f6f-a67e-200c1f221343,WR,45,,9
+Tier 8,90,Chris Godwin,d0d1514c-26e3-405f-84de-8072bc2b0fa7,WR,46,,8
+Tier 8,91,Jaylen Warren,d8c284a1-8746-41fc-bd8e-fbfb20bf2e92,RB,32,,8
+Tier 8,92,Cooper Kupp,c0c80e9d-fe68-441d-90d4-b5828752b9c7,WR,47,,8
+Tier 8,93,Khalil Shakir,55ba823b-3e25-4a1d-922d-9c622a052aaf,WR,48,,8
+Tier 8,94,Jayden Higgins,6f51ed2b-b312-4ac8-a02b-f791528ab5eb,WR,49,,10
+Tier 8,95,Michael Pittman Jr.,1589e799-5723-4f51-a99a-817c1f5d9a61,WR,50,,10
+Tier 8,96,David Njoku,96103fd4-acc7-4dba-adcf-ae140cf7d983,TE,8,,8
+Tier 8,97,Evan Engram,43e1dda1-d83d-4da9-a11a-e6c4b714e102,TE,9,,8
+Tier 8,98,Jordan Mason,85474863-13c5-412b-a5fd-cebdd1383524,RB,33,,9
+Tier 8,99,Quinshon Judkins,513473ee-8e3f-48d1-a0fc-a4f77bc195b9,RB,34,,9
+Tier 8,100,J.K. Dobbins,fb971e03-d484-4d81-982d-0e0af12179e6,RB,35,,9
+Tier 8,101,Kyler Murray,017dad8b-5da7-4e17-a567-10e147fbb7c7,QB,7,,10
+Tier 8,102,Bo Nix,bfa23971-1c74-42b7-a7da-cf3bb80a1355,QB,8,,10
+Tier 8,103,Baker Mayfield,12a4ad78-4491-4aa3-8373-0fa48356c7f7,QB,9,,10
+Tier 9,104,Cam Skattebo,45040fd6-c586-4f05-b4a5-35e32042f5c8,RB,36,,10
+Tier 9,105,Zach Charbonnet,39526890-3152-4899-a948-99f0a9858b6f,RB,37,,10
+Tier 9,106,Luther Burden III,9df8f9e8-d362-46e0-be35-502442b747e6,WR,51,,10
+Tier 9,107,Rashid Shaheed,8c7f9176-18b8-4f59-bc46-2c14a60bfed8,WR,52,,11
+Tier 9,108,Darnell Mooney,eefaafc6-b10a-4794-a6dc-4233a1c2263f,WR,53,,10
+Tier 9,109,Keon Coleman,d94128a2-2821-4fe3-95ee-ad6a026b85cb,WR,54,,10
+Tier 9,110,Brandon Aiyuk,7eba46a1-1484-4352-b7f8-480163694c25,WR,55,,10
+Tier 9,111,Colston Loveland,72f1fd78-4146-4527-8de9-823b13309425,TE,10,,10
+Tier 9,112,Tank Bigsby,91edd6d6-bd65-4571-8713-41fc3cd2eb92,RB,38,,10
+Tier 9,113,Bhayshul Tuten,ae822ce4-b4ff-4b53-bf83-be036fe15dd2,RB,39,,10
+Tier 9,114,Jaydon Blue,e4a0d065-ce78-4bf8-8e8e-ecce74e7e30c,RB,40,,10
+Tier 9,115,Rhamondre Stevenson,9a1d9082-34b9-40f4-8e3c-330caa3fa989,RB,41,,10
+Tier 9,116,Justin Fields,69a1328c-ef69-41a4-a9c6-9ef0f96179f0,QB,10,,11
+Tier 9,117,Brock Purdy,a9944d33-2618-448b-9dfb-73b9a43b1296,QB,11,,11
+Tier 9,118,Dak Prescott,1a3c579b-489d-476c-8e92-96396daccfa2,QB,12,,11
+Tier 9,119,Caleb Williams,a6e88774-89df-4886-b850-16c63473fcbe,QB,13,,11
+Tier 9,120,Tyler Warren,59cd0550-2714-465f-a640-99957e7fc514,TE,11,,10
+Tier 10,121,Ray Davis,216c2a61-381c-4520-a163-a8af32943fb9,RB,42,,11
+Tier 10,122,Trey Benson,9ee85b14-7fae-4772-b58f-fa2922f230ef,RB,43,,10
+Tier 10,123,Braelon Allen,84f0a2d4-81a1-424b-a516-172e02cd82e3,RB,44,,11
+Tier 10,124,Drake Maye,1fd437b3-ec8a-40ff-af9b-bdeb9e195111,QB,14,,12
+Tier 10,125,Trevor Lawrence,01b46905-02f2-4016-a320-7cc36b5d1afc,QB,15,,12
+Tier 10,126,Dallas Goedert,315ad6ba-764f-4118-9deb-03720308a0c2,TE,12,,12
+Tier 10,127,Dalton Kincaid,8e3162f9-5b76-46e8-b189-777db6212f8b,TE,13,,12
+Tier 10,128,Tucker Kraft,48dddfc4-9fbb-49f7-93ca-49b5bad5b640,TE,14,,12
+Tier 10,129,Jake Ferguson,5336c84a-59d1-4502-b26c-a9a7a5683195,TE,15,,12
+Tier 10,130,Marvin Mims Jr.,e7384056-0c8d-48b5-8ece-43a68ad9d200,WR,56,,12
+Tier 10,131,Kyle Williams,d1bb13ec-b37e-420c-b9f5-e76698cb6b2b,WR,57,,12
+Tier 10,132,Justin Herbert,37bd88b0-b695-4a09-a0e9-fc29f6c14dfd,QB,16,,12
+Tier 10,133,J.J. McCarthy,78a6939e-5faf-45ed-98f2-674a84e65045,QB,17,,13
+Tier 10,134,Jordan Love,86d70c50-1438-435a-be56-17fc097d2763,QB,18,,13
+Tier 10,135,C.J. Stroud,d97eb184-b572-477a-98c8-e918a0bf1c66,QB,19,,13
+Tier 10,136,Jared Goff,a889c484-29f2-47ac-805b-49691067644b,QB,20,,13
+Tier 10,137,Christian Kirk,e35cb821-a7ae-41d8-a7c1-3fb43082b786,WR,58,,12
+Tier 10,138,Javonte Williams,af512904-a1c9-4f40-ac9b-3f04329bc6b8,RB,45,,11
+Tier 10,139,Isaac Guerendo,5517771d-f8e5-4ab2-b023-c06057b9d12a,RB,46,,11
+Tier 10,140,Rachaad White,9012f171-568e-4292-94ba-f4b308eac941,RB,47,,11
+Tier 10,141,Tyler Allgeier,00403734-5e69-424c-974e-ceefbc335618,RB,48,,12
+Tier 10,142,Tyjae Spears,76809c5a-f06d-479a-a218-f22ee3e13a83,RB,49,,10
+Tier 10,143,Dylan Sampson,032a165a-b343-4c8f-a56f-8fc47d2a4a07,RB,50,,10
+Tier 10,144,Marquise Brown,27c2ab08-d88c-427a-b0d3-cf0ba47af2f7,WR,59,,12
+Tier 10,145,Austin Ekeler,566b0f64-6a4f-4882-aa36-99d15ce990f5,RB,51,,12
+Tier 10,146,Kyle Pitts Sr.,baf94a12-0921-4655-9b10-12b59b77c57c,TE,16,,12
+Tier 10,147,Najee Harris,3a9a963f-6618-40ac-93c6-96ea04cb223f,RB,52,,12
+Tier 10,148,Jacory Croskey-Merritt,f47f5778-3c4d-4320-a4f9-cb57a229024a,RB,53,,12
+Tier 10,149,Will Shipley,f69a3a63-744a-4568-a158-b69f0d5e4eb6,RB,54,,13
+Tier 10,150,Roschon Johnson,3e43e336-3c1d-430f-8961-701e685e8d5d,RB,55,,13
+Tier 10,151,Jaylen Wright,fa1a54e5-4c1c-45b8-9e9a-3c1568a28d6b,RB,56,,13
+Tier 11,152,Keenan Allen,8086a0ab-51d0-4510-af6e-34603b9ad807,WR,60,,13
+Tier 11,153,Wan'Dale Robinson,42be1a8b-6bdd-4bda-a857-3a01bbc6aeac,WR,61,,13
+Tier 11,154,Cedric Tillman,be28ffd2-9c10-44fd-937a-0dd5fa9f22c9,WR,62,,13
+Tier 11,155,Rashod Bateman,a539369c-22ad-4d91-b5b9-a616d39018b8,WR,63,,13
+Tier 11,156,Romeo Doubs,c27b2fd7-45a7-409c-9973-3346fd3062fc,WR,64,,14
+Tier 11,157,Anthony Richardson Sr.,ab78a171-01c4-457c-aa8c-7fd835bff986,QB,21,,16
+Tier 11,158,Michael Penix Jr.,a6b061d0-7d58-45b0-8539-c0dd60cb26f9,QB,22,,16
+Tier 11,159,Tua Tagovailoa,bfd060c8-dfa0-43d4-beb2-6f3e5b9df69e,QB,23,,16
+Tier 11,160,Bryce Young,04c979d6-83b7-40dc-83fc-ed4db79ce5f9,QB,24,,16
+Tier 11,161,Cameron Ward,ff6b158c-6ff5-45c7-879e-32086288c5fb,QB,25,,16
+Tier 11,162,Jalen McMillan,2b703cdf-19c6-44bc-9061-11994c555ce9,WR,65,,14
+Tier 11,163,Quentin Johnston,82b3392d-0403-4cc7-9adc-8881b1647655,WR,66,,14
+Tier 11,164,Hunter Henry,24e943a8-7926-4012-9d7e-138315b764cd,TE,17,,15
+Tier 11,165,Zach Ertz,44a906d5-b179-45f9-b69f-281595bea71d,TE,18,,15
+Tier 11,166,Brenton Strange,951df6a2-c1b0-499f-819e-67798c2cc6a2,TE,19,,16
+Tier 11,167,Chig Okonkwo,2a65964a-1345-435e-998e-ee29adf6d251,TE,20,,16
+Tier 11,168,Tre' Harris,06bb179e-5f55-4679-9f0d-e94d1c5dff0c,WR,67,,12
+Tier 11,169,Pat Bryant,e0d74144-6bd8-467f-b5a6-de01ef683097,WR,68,,15
+Tier 11,170,Nick Chubb,6958938f-e1b1-4a04-9277-0d13ce07df21,RB,57,,13
+Tier 11,171,Jerome Ford,47a14de7-342a-4a2d-b5ea-2e4cca880e67,RB,58,,11
+Tier 11,172,Miles Sanders,f24adb34-5412-4edf-95ff-6b68e5fbd41d,RB,59,,15
+Tier 11,173,Brashard Smith,edeb9b06-d0b7-44cc-ac47-971fa68ff0a6,RB,60,,14
+Tier 11,174,Jarquez Hunter,e5efd76e-3450-4e90-b4a4-74a10f8cef0b,RB,61,,14
+Tier 11,175,Woody Marks,1dd1d43a-bb2c-4293-b086-af81f7f8a31f,RB,62,,15
+Tier 11,176,Sean Tucker,89c932e5-9b13-487f-97c6-c23a2864510e,RB,63,,16
+Tier 11,177,DJ Giddens,5187785b-3707-4207-aee0-a55778dfb9a1,RB,64,,15
+Tier 11,178,Tahj Brooks,10b8eca4-c667-4927-a2ab-e24021ad18a5,RB,65,,16
+Tier 11,179,Blake Corum,e34d874e-3fef-4059-887e-33a2485c13b6,RB,66,,16
+Tier 12,180,Jaylin Noel,3dbcda8c-adc6-4d3e-9ed8-12b7581aa0ba,WR,69,,16
+Tier 12,181,Jack Bech,3506f452-2e97-46e6-be4b-e79fed5b3491,WR,70,,16
+Tier 12,182,Jalen Royals,a46b6ee1-e38e-48cc-9d43-0917418812fc,WR,71,,16
+Tier 12,183,Adam Thielen,1cc825d2-4975-4afe-a47d-b69f0e57cbc1,WR,72,,16
+Tier 12,184,Jonnu Smith,c6ad3f37-27db-4232-99cc-aeed22777e85,TE,21,,16
+Tier 12,185,Mason Taylor,a6ce2c32-ead2-45cf-8add-22978d63a07e,TE,22,,16
+Tier 12,186,Isaiah Likely,427d8203-aea8-4b01-972f-039aa0baa0c3,TE,23,,16
+Tier 12,187,Geno Smith,2f6b0b7d-b3fe-46e5-b7ef-c84495f0e78a,QB,26,,16
+Tier 12,188,Matthew Stafford,50be3583-2a3d-455a-91ce-ba6959783642,QB,27,,16
+Tier 12,189,Joshua Palmer,6dc7832f-45d2-4ae6-8c6a-3595e185a18e,WR,73,,16
+Tier 12,190,Xavier Legette,a18e7872-b3df-4c74-8130-feb720a928c1,WR,74,,16
+Tier 12,191,DeMario Douglas,63cbde87-5fd3-410c-9c64-2185510182ef,WR,75,,16
+Tier 12,192,Dont'e Thornton Jr.,7062199b-47a5-4de1-bc7d-22640861b406,WR,76,,16
+Tier 12,193,Elijah Arroyo,c9fab627-9cbf-4cfe-b2fa-288604ae1755,TE,24,,16
+Tier 12,194,Cade Otton,027fe218-a84a-450c-a89d-7ad6c4cf94b9,TE,25,,16
+Tier 12,195,Trevor Etienne,8aa163b7-5f2f-4ed5-a721-79fd60ba544e,RB,67,,16
+Tier 12,196,Kyle Monangai,2521c244-cb3c-497e-b928-9c2f542bb7c3,RB,68,,16
+Tier 12,197,Keaton Mitchell,b760285b-f146-44b7-91a6-80b79734aa3a,RB,69,,16
+Tier 12,198,Rico Dowdle,a07ec2e7-a9ff-4797-8b81-e97de03a6a51,RB,70,,16
+Tier 12,199,Justice Hill,8f4756df-0eba-4393-bc91-cd38984dcda8,RB,71,,16
+Tier 12,200,Kareem Hunt,011d7af8-9fc6-47e2-b1c7-60ad22188306,RB,72,,16

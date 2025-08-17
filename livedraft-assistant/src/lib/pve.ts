@@ -141,9 +141,13 @@ function computeTalent(remaining: Player[]): { [playerName: string]: number } {
 function blendedPick(p: Player): number | null {
   const u = p.und_adp ?? null;
   const s = p.slp_rank ?? null;
-  if (u === null && s === null) return null;
+  const r = p.ron_rank ?? null;
+  // Prefer Underdog ADP; lightly blend in Sleeper; very light Ron if only Ron exists
   if (u !== null && s !== null) return 0.7 * u + 0.3 * s;
-  return (u ?? s)!;
+  if (u !== null) return u;
+  if (s !== null) return s;
+  if (r !== null) return r; // last resort
+  return null;
 }
 
 function computeScarcity(
@@ -277,14 +281,26 @@ function computeAvailabilityRisk(
   const nextPick = Math.min(...nextPicks);
   const totalPicksApprox = teams * 15;
   const phase = Math.max(0, Math.min(1, currentOverall / totalPicksApprox));
-  const s = baseS + Math.round(4 * phase);
+  let s = baseS + Math.round(4 * phase);
   remaining.forEach(player => {
     const bp = blendedPick(player);
     if (bp === null) { result[player.player] = { risk: 0.5, takeNow: false }; return; }
+    // Ron target round adjustment (convert 12-team target round to T-team overall pick)
+    let takeNowBias = 0;
+    if (player.ron_target_round_12 != null) {
+      const targetOverall12 = 12 * (player.ron_target_round_12 - 1) + 6.5; // middle of round
+      const targetOverallT = targetOverall12 * (teams / 12);
+      if (currentOverall >= targetOverallT) {
+        takeNowBias = 0.1; // small bump when at/after target
+      } else if (targetOverallT - currentOverall <= teams) {
+        takeNowBias = 0.05; // within ~1 round
+      }
+    }
     const delta = nextPick - bp;
     const availProb = 1 / (1 + Math.exp(-delta / s));
-    const risk = 1 - availProb;
-    const takeNow = bp <= nextPick;
+    let risk = 1 - availProb + takeNowBias;
+    risk = Math.max(0, Math.min(1, risk));
+    const takeNow = bp <= nextPick || takeNowBias >= 0.1;
     result[player.player] = { risk, takeNow };
   });
   return result;

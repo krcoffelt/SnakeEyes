@@ -93,7 +93,7 @@ export function silhouette1D(values: number[], assignments: number[]): number {
 }
 
 /**
- * Build tiers for players using k-means or fallback to quantiles
+ * Build tiers for players using Ron tiers when present, else k-means/quantiles
  */
 export function buildTiers(players: Player[], byPosition: boolean = true): Player[] {
   if (players.length === 0) return players;
@@ -104,14 +104,22 @@ export function buildTiers(players: Player[], byPosition: boolean = true): Playe
     const result: Player[] = [];
     
     positions.forEach(pos => {
-      const posPlayers = players.filter(p => p.pos === pos && p.blend_rank !== null);
-      if (posPlayers.length >= 12) {
+      const posPlayers = players.filter(p => p.pos === pos);
+      const withRon = posPlayers.filter(p => p.ron_tier != null);
+      const withoutRon = posPlayers.filter(p => p.ron_tier == null && p.blend_rank !== null);
+
+      // Prefer Ron-provided tiers when available
+      withRon.forEach(p => {
+        result.push({ ...p, tier: p.ron_tier! });
+      });
+
+      if (withoutRon.length >= 12) {
         // Use k-means with silhouette score optimization
-        const values = posPlayers.map(p => p.blend_rank!);
+        const values = withoutRon.map(p => p.blend_rank!);
         let bestK = 5;
         let bestSilhouette = -1;
         
-        for (let k = 4; k <= Math.min(7, Math.floor(posPlayers.length / 3)); k++) {
+        for (let k = 4; k <= Math.min(7, Math.floor(withoutRon.length / 3)); k++) {
           const assignments = kMeans1D(values, k);
           const silhouette = silhouette1D(values, assignments);
           
@@ -122,33 +130,33 @@ export function buildTiers(players: Player[], byPosition: boolean = true): Playe
         }
         
         const assignments = kMeans1D(values, bestK);
-        posPlayers.forEach((player, index) => {
+        withoutRon.forEach((player, index) => {
           result.push({ ...player, tier: assignments[index] + 1 });
         });
-      } else if (posPlayers.length >= 5) {
+      } else if (withoutRon.length >= 5) {
         // Fallback to equal-depth quantiles
-        const sorted = [...posPlayers].sort((a, b) => a.blend_rank! - b.blend_rank!);
+        const sorted = [...withoutRon].sort((a, b) => a.blend_rank! - b.blend_rank!);
         const tierSize = Math.ceil(sorted.length / 5);
         
         sorted.forEach((player, index) => {
           result.push({ ...player, tier: Math.floor(index / tierSize) + 1 });
         });
       } else {
-        // Too few players, assign tier 1
-        posPlayers.forEach(player => {
+        // Too few players, assign tier 1 for those without Ron tiers
+        withoutRon.forEach(player => {
           result.push({ ...player, tier: 1 });
         });
       }
     });
     
-    // Add players without blend_rank (tier null)
-    const noRankPlayers = players.filter(p => p.blend_rank === null);
+    // Add players without blend_rank (tier null), if any left
+    const noRankPlayers = players.filter(p => p.blend_rank === null && p.ron_tier == null);
     result.push(...noRankPlayers);
     
     return result;
   } else {
-    // Global tiers across all positions
-    const rankedPlayers = players.filter(p => p.blend_rank !== null);
+    // Global tiers across all positions (kept for completeness; rarely used)
+    const rankedPlayers = players.filter(p => p.blend_rank !== null && p.ron_tier == null);
     if (rankedPlayers.length >= 12) {
       const values = rankedPlayers.map(p => p.blend_rank!);
       const assignments = kMeans1D(values, 5);
@@ -157,6 +165,10 @@ export function buildTiers(players: Player[], byPosition: boolean = true): Playe
         (player as Player & { tier: number }).tier = assignments[index] + 1;
       });
     }
+    
+    // Ensure Ron tiers are applied if present
+    const withRon = players.filter(p => p.ron_tier != null);
+    withRon.forEach(p => { (p as Player & { tier: number }).tier = p.ron_tier!; });
     
     return players;
   }

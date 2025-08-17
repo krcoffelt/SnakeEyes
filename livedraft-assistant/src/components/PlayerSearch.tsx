@@ -255,6 +255,9 @@ export default function PlayerSearch() {
                     )}
                   </div>
                 </th>
+                <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
+                  RON ADP
+                </th>
                 <th 
                   className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                   onClick={() => handleSort('value')}
@@ -312,6 +315,9 @@ export default function PlayerSearch() {
                   </td>
                   <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
                     {player.slp_rank ? player.slp_rank.toFixed(1) : '-'}
+                  </td>
+                  <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
+                    {player.ron_rank != null ? Math.round(player.ron_rank) : '-'}
                   </td>
                   <td className="py-4 px-4">
                     {player.und_adp && player.slp_rank ? (
