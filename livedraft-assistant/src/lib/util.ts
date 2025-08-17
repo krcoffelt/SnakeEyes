@@ -21,7 +21,10 @@ export function normalizeName(s: string): string {
  */
 export function playerKey(name: string): string {
   const n = normalizeName(name);
-  return n.replace(/[.'’]/g, '').replace(/\s+/g, ' ').trim();
+  const base = n.replace(/[.'’]/g, '').replace(/\s+/g, ' ').trim();
+  // Strip common generational suffixes at end of name
+  const suffixes = /\s+(jr|jr\.|sr|sr\.|ii|iii|iv|v)$/i;
+  return base.replace(suffixes, '').trim();
 }
 
 /**
