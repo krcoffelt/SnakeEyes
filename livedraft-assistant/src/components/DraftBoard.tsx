@@ -8,6 +8,9 @@ export default function DraftBoard() {
   const { draftBoard, config, drafted, undo, resetDraft } = useDraftStore();
   const [visibleRounds, setVisibleRounds] = useState({ start: 1, end: 5 });
   
+  // Debug logging
+  console.log('DraftBoard render:', { draftBoard, drafted: drafted.length });
+  
   const maxRounds = 15; // Maximum rounds to display
   const teams = config.teams;
   const roundsToShow = 5; // Number of rounds visible at once
@@ -205,6 +208,11 @@ export default function DraftBoard() {
                     const isCurrentPick = round === currentRound && pick === currentPick;
                     const isUserTeam = pick === config.slot;
                     
+                    // Debug logging for this specific cell
+                    if (draftedPlayer) {
+                      console.log(`Round ${round}, Pick ${pick}:`, draftedPlayer);
+                    }
+                    
                     return (
                       <div
                         key={pick}
@@ -218,17 +226,20 @@ export default function DraftBoard() {
                       >
                         {draftedPlayer ? (
                           <div className="p-2 h-full flex flex-col justify-between">
-                            <div className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                            {/* Player Name - Main Display */}
+                            <div className="text-xs font-medium text-gray-900 dark:text-white truncate text-center">
                               {getAbbreviatedName(draftedPlayer.player)}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {draftedPlayer.bye && `BYE ${draftedPlayer.bye}`}
-                              {draftedPlayer.isRookie && (
-                                <span className="ml-1 inline-flex items-center px-1 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
-                                  R
-                                </span>
-                              )}
+                            
+                            {/* Position and Team - Secondary Info */}
+                            <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                              {draftedPlayer.pos && draftedPlayer.team ? 
+                                `${draftedPlayer.pos}-${draftedPlayer.team}` : 
+                                draftedPlayer.pos || 'N/A'
+                              }
                             </div>
+                            
+                            {/* Bottom Row - Position Badge and Draft Info */}
                             <div className="flex items-center justify-between">
                               <span className={`text-xs px-2 py-1 rounded-full ${getPositionColor(draftedPlayer.pos)}`}>
                                 {draftedPlayer.pos}
