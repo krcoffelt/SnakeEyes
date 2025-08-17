@@ -50,23 +50,23 @@ export default function LeagueSetup() {
             <div className="flex items-center justify-center mb-6">
               <Trophy className="h-16 w-16 text-yellow-400 mr-4" />
               <div>
-                <h1 className="text-5xl font-bold text-white mb-2">Draft Value Assistant</h1>
-                <p className="text-xl text-purple-200">Powered by Advanced PVE</p>
+                <h1 className="text-5xl font-bold text-white mb-2" style={{ fontFamily: 'Times New Roman, serif' }}>Draft Value Assistant</h1>
+                <p className="text-xl text-purple-200" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Powered by Advanced PVE</p>
               </div>
             </div>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
               Set up your league settings and let our Positional Value Engine guide you to draft day success
             </p>
           </div>
 
           {/* League Setup Form */}
           <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">League Configuration</h2>
+            <h2 className="text-2xl font-bold text-white mb-6 text-center" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>League Configuration</h2>
             
             <div className="space-y-6">
               {/* League Size */}
               <div className="space-y-3">
-                <label className="text-white font-medium flex items-center">
+                <label className="text-white font-medium flex items-center" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                   <Users className="h-5 w-5 mr-2" />
                   League Size
                 </label>
@@ -79,8 +79,8 @@ export default function LeagueSetup() {
                         : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
                     }`}
                   >
-                    <div className="text-2xl font-bold">10</div>
-                    <div className="text-sm">Teams</div>
+                    <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>10</div>
+                    <div className="text-sm" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Teams</div>
                   </button>
                   <button
                     onClick={() => setLeagueSettings(prev => ({ ...prev, teams: 12 }))}
@@ -90,15 +90,15 @@ export default function LeagueSetup() {
                         : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
                     }`}
                   >
-                    <div className="text-2xl font-bold">12</div>
-                    <div className="text-sm">Teams</div>
+                    <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>12</div>
+                    <div className="text-sm" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Teams</div>
                   </button>
                 </div>
               </div>
 
               {/* Scoring System */}
               <div className="space-y-3">
-                <label className="text-white font-medium flex items-center">
+                <label className="text-white font-medium flex items-center" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                   <Target className="h-5 w-5 mr-2" />
                   Scoring System
                 </label>
@@ -113,7 +113,7 @@ export default function LeagueSetup() {
                           : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
                       }`}
                     >
-                      <div className="font-medium">{scoring}</div>
+                      <div className="font-medium" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{scoring}</div>
                     </button>
                   ))}
                 </div>
@@ -121,7 +121,7 @@ export default function LeagueSetup() {
 
               {/* FLEX Configuration */}
               <div className="space-y-3">
-                <label className="text-white font-medium flex items-center">
+                <label className="text-white font-medium flex items-center" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                   <Zap className="h-5 w-5 mr-2" />
                   FLEX Slots
                 </label>
@@ -134,8 +134,8 @@ export default function LeagueSetup() {
                         : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
                     }`}
                   >
-                    <div className="text-2xl font-bold">1</div>
-                    <div className="text-sm">FLEX</div>
+                    <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>1</div>
+                    <div className="text-sm" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>FLEX</div>
                   </button>
                   <button
                     onClick={() => setLeagueSettings(prev => ({ ...prev, flexCount: 2 }))}
@@ -145,21 +145,22 @@ export default function LeagueSetup() {
                         : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
                     }`}
                   >
-                    <div className="text-2xl font-bold">2</div>
-                    <div className="text-sm">FLEX</div>
+                    <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>2</div>
+                    <div className="text-sm" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>FLEX</div>
                   </button>
                 </div>
               </div>
 
               {/* Draft Position */}
               <div className="space-y-3">
-                <label className="text-white font-medium">
+                <label className="text-white font-medium" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                   Your Draft Position
                 </label>
                 <select
                   value={leagueSettings.slot}
                   onChange={(e) => setLeagueSettings(prev => ({ ...prev, slot: parseInt(e.target.value) }))}
                   className="w-full p-4 bg-white/10 border border-white/20 rounded-xl text-white text-center text-lg font-medium focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
                 >
                   {Array.from({ length: leagueSettings.teams }, (_, i) => (
                     <option key={i + 1} value={i + 1} className="bg-gray-800 text-white">
@@ -176,6 +177,7 @@ export default function LeagueSetup() {
                 onClick={handleStartDraft}
                 disabled={isLoading}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
@@ -190,8 +192,8 @@ export default function LeagueSetup() {
 
             {/* League Summary */}
             <div className="mt-6 p-4 bg-white/5 rounded-xl border border-white/10">
-              <h3 className="text-white font-medium mb-2">League Summary</h3>
-              <div className="text-sm text-gray-300 space-y-1">
+              <h3 className="text-white font-medium mb-2" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>League Summary</h3>
+              <div className="text-sm text-gray-300 space-y-1" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
                 <div>• {leagueSettings.teams}-team league</div>
                 <div>• {leagueSettings.ppr} scoring</div>
                 <div>• {leagueSettings.flexCount} FLEX slot{leagueSettings.flexCount > 1 ? 's' : ''}</div>
@@ -203,7 +205,7 @@ export default function LeagueSetup() {
 
           {/* Features Preview */}
           <div className="mt-8 text-center">
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-sm" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
               Your PVE weights and settings will be automatically optimized based on your league configuration
             </p>
           </div>
