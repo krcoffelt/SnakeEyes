@@ -35,6 +35,17 @@ export default function DraftBoard() {
     return { round, pick };
   };
   
+  // Function to abbreviate player names (First name + Last initial)
+  const getAbbreviatedName = (fullName: string) => {
+    const nameParts = fullName.trim().split(' ');
+    if (nameParts.length >= 2) {
+      const firstName = nameParts[0];
+      const lastName = nameParts[nameParts.length - 1];
+      return `${firstName} ${lastName.charAt(0)}.`;
+    }
+    return fullName; // Fallback for single names
+  };
+  
   const { round: currentRound, pick: currentPick } = getCurrentPick();
   
   // Auto-scroll to keep current round visible
@@ -208,7 +219,7 @@ export default function DraftBoard() {
                         {draftedPlayer ? (
                           <div className="p-2 h-full flex flex-col justify-between">
                             <div className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                              {draftedPlayer.player}
+                              {getAbbreviatedName(draftedPlayer.player)}
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400">
                               {draftedPlayer.bye && `BYE ${draftedPlayer.bye}`}

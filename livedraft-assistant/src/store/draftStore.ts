@@ -208,8 +208,8 @@ export const useDraftStore = create<DraftStore>()(
       },
 
       draft: (playerName: string, round: number, pick: number, draftedBy: 'me' | 'opp') => {
-        const { players, draftBoard, config } = get();
-        const player = players.find(p => p.player === playerName);
+        const { remaining, draftBoard, config } = get();
+        const player = remaining.find(p => p.player === playerName);
 
         if (!player) return;
 
@@ -232,8 +232,8 @@ export const useDraftStore = create<DraftStore>()(
         if (!newDraftBoard[round]) newDraftBoard[round] = {};
         newDraftBoard[round][pick] = draftedPlayer;
 
-        // Update remaining players
-        const newRemaining = players.filter(p => p.player !== playerName);
+        // Update remaining players - filter from remaining, not all players
+        const newRemaining = remaining.filter(p => p.player !== playerName);
 
         // Update my roster if I drafted the player
         let newMyRoster = { ...get().myRoster };
@@ -263,7 +263,12 @@ export const useDraftStore = create<DraftStore>()(
 
         const lastDrafted = drafted[drafted.length - 1];
         const newDrafted = drafted.slice(0, -1);
-        const newRemaining = [...get().remaining, players.find(p => p.player === lastDrafted.player)!];
+        
+        // Find the player in the original players array to restore
+        const playerToRestore = players.find(p => p.player === lastDrafted.player);
+        if (!playerToRestore) return;
+        
+        const newRemaining = [...get().remaining, playerToRestore];
 
         // Update my roster
         let newMyRoster = { ...get().myRoster };
