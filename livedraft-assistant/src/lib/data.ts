@@ -18,6 +18,17 @@ function applyAlias(name: string): string {
   return NAME_ALIASES[key] ?? name;
 }
 
+// Ron CSV normalized record type
+type RonRecord = {
+  ron_id?: string;
+  name: string;
+  ron_rank?: number;
+  ron_pos?: string;
+  ron_pos_rank?: number;
+  ron_tier?: number;
+  ron_target_round_12?: number;
+};
+
 /**
  * Fetch and parse CSV data using PapaParse
  */
@@ -95,7 +106,7 @@ export async function loadSleeper(): Promise<Player[]> {
 }
 
 /** Load Ron rankings data */
-export async function loadRon(): Promise<Array<{ ron_id?: string; name: string; ron_rank?: number; ron_pos?: string; ron_pos_rank?: number; ron_tier?: number; ron_target_round_12?: number }>> {
+export async function loadRon(): Promise<RonRecord[]> {
   const data = await fetchCsv<CSVData>('/data/Ron_Rankings.csv');
   const rows = data
     .map(row => {
@@ -113,7 +124,7 @@ export async function loadRon(): Promise<Array<{ ron_id?: string; name: string; 
       const targetRound = safeParseNumber(row['Target Round'] || row['TargetRound']);
       const tierNumMatch = tierRaw.match(/tier\s*(\d+)/i);
       const ron_tier = tierNumMatch ? Number(tierNumMatch[1]) : null;
-      return {
+      const rec: RonRecord = {
         ron_id: id || undefined,
         name,
         ron_rank: rank ?? undefined,
@@ -122,8 +133,9 @@ export async function loadRon(): Promise<Array<{ ron_id?: string; name: string; 
         ron_tier: ron_tier ?? undefined,
         ron_target_round_12: targetRound ?? undefined
       };
+      return rec;
     })
-    .filter(Boolean) as Array<{ ron_id?: string; name: string; ron_rank?: number; ron_pos?: string; ron_pos_rank?: number; ron_tier?: number; ron_target_round_12?: number }>;
+    .filter(Boolean) as RonRecord[];
   return rows;
 }
 
@@ -131,7 +143,7 @@ export async function loadRon(): Promise<Array<{ ron_id?: string; name: string; 
 export function mergePlayers(
   underdog: Player[], 
   sleeper: Player[],
-  ron: Array<{ ron_id?: string; name: string; ron_rank?: number; ron_pos?: string; ron_pos_rank?: number; ron_tier?: number; ron_target_round_12?: number }>,
+  ron: RonRecord[],
   blendConfig: { und: number; slp: number } = { und: 0.6, slp: 0.4 }
 ): Player[] {
   const sleeperMap = new Map<string, Player>();
@@ -140,8 +152,8 @@ export function mergePlayers(
     sleeperMap.set(key, player);
   });
 
-  const ronById = new Map<string, any>();
-  const ronByName = new Map<string, any>();
+  const ronById = new Map<string, RonRecord>();
+  const ronByName = new Map<string, RonRecord>();
   ron.forEach(r => {
     if (r.ron_id) ronById.set(r.ron_id, r);
     ronByName.set(playerKey(r.name), r);
@@ -215,7 +227,7 @@ export function mergePlayers(
   });
 }
 
-export function hashSourceData(underdog: Player[], sleeper: Player[], ron: any[]): string {
+export function hashSourceData(underdog: Player[], sleeper: Player[], ron: RonRecord[]): string {
   return hashData({ underdog, sleeper, ron });
 }
 
