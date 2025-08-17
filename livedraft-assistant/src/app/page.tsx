@@ -32,18 +32,18 @@ export default function LeagueSetup() {
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: 'transparent' }}>
       {/* Gradient Background with Noise */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-700 to-gray-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-red-600 to-red-900"></div>
       
       {/* Noise Overlay */}
       <div 
-        className="absolute inset-0 opacity-30"
+        className="absolute inset-0 opacity-40"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
       ></div>
       
       {/* Additional subtle gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
       
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center p-4 min-h-screen">
@@ -51,20 +51,20 @@ export default function LeagueSetup() {
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
-              <Trophy className="h-16 w-16 text-yellow-400 mr-4" />
+              <Trophy className="h-16 w-16 text-yellow-300 mr-4" />
               <div>
-                <h1 className="text-5xl font-bold text-white mb-2" style={{ fontFamily: 'Times New Roman, serif' }}>Draft Value Assistant</h1>
-                <p className="text-xl text-purple-200" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Powered by Advanced PVE</p>
+                <h1 className="text-5xl font-bold text-white mb-2 drop-shadow-lg" style={{ fontFamily: 'Times New Roman, serif' }}>Draft Value Assistant</h1>
+                <p className="text-xl text-yellow-100 drop-shadow-md" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Powered by Advanced PVE</p>
               </div>
             </div>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+            <p className="text-lg text-orange-100 max-w-2xl mx-auto drop-shadow-md" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
               Set up your league settings and let our Positional Value Engine guide you to draft day success
             </p>
           </div>
 
           {/* League Setup Form */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>League Configuration</h2>
+          <div className="bg-white/15 backdrop-blur-lg rounded-3xl p-8 border border-white/25 shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center drop-shadow-md" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>League Configuration</h2>
             
             <div className="space-y-6">
               {/* League Size */}
