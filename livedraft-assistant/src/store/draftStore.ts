@@ -148,6 +148,18 @@ function calculateOptimalAvailabilityS(config: LeagueConfig): number {
   return teams === 10 ? 5 : 7; // More sensitive for 10-team, less for 12-team
 }
 
+// helper to rebuild board from drafted list
+function buildBoard(drafted: DraftedPlayer[], teams: number): DraftBoard {
+  const board: DraftBoard = {};
+  drafted.forEach(d => {
+    const isOdd = d.round % 2 === 1;
+    const col = isOdd ? d.pick : (teams - d.pick + 1);
+    if (!board[d.round]) board[d.round] = {};
+    board[d.round][col] = d;
+  });
+  return board;
+}
+
 const defaultConfig: LeagueConfig = {
   teams: 10,
   slot: 7,
@@ -247,8 +259,7 @@ export const useDraftStore = create<DraftStore>()(
         // Update remaining players - filter from remaining, not all players
         const newRemaining = remaining.filter(p => p.player !== playerName);
 
-        // Update my roster if I drafted the player
-        const newMyRoster = { ...get().myRoster };
+        const newMyRoster = { ...get().myRoster } as RosterCounts;
         if (draftedBy === 'me' && player.pos) {
           if (player.pos === 'QB') newMyRoster.QB++;
           else if (player.pos === 'RB') newMyRoster.RB++;
@@ -259,10 +270,13 @@ export const useDraftStore = create<DraftStore>()(
           newMyRoster.total++;
         }
 
+        const newDrafted = [...get().drafted, draftedPlayer];
+        const rebuiltBoard = buildBoard(newDrafted, config.teams);
+
         set({
-          drafted: [...get().drafted, draftedPlayer],
+          drafted: newDrafted,
           remaining: newRemaining,
-          draftBoard: newDraftBoard,
+          draftBoard: rebuiltBoard,
           myRoster: newMyRoster
         });
 
@@ -282,8 +296,7 @@ export const useDraftStore = create<DraftStore>()(
         
         const newRemaining = [...get().remaining, playerToRestore];
 
-        // Update my roster
-        const newMyRoster = { ...get().myRoster };
+        const newMyRoster = { ...get().myRoster } as RosterCounts;
         if (lastDrafted.draftedBy === 'me' && lastDrafted.pos) {
           if (lastDrafted.pos === 'QB') newMyRoster.QB--;
           else if (lastDrafted.pos === 'RB') newMyRoster.RB--;
@@ -294,18 +307,12 @@ export const useDraftStore = create<DraftStore>()(
           newMyRoster.total--;
         }
 
-        // Update draft board - delete using team column index
-        const newDraftBoard = { ...get().draftBoard };
-        const isOddRound = lastDrafted.round % 2 === 1;
-        const teamColumn = isOddRound ? lastDrafted.pick : (config.teams - lastDrafted.pick + 1);
-        if (newDraftBoard[lastDrafted.round]) {
-          delete newDraftBoard[lastDrafted.round][teamColumn];
-        }
+        const rebuiltBoard = buildBoard(newDrafted, config.teams);
 
         set({
           drafted: newDrafted,
           remaining: newRemaining,
-          draftBoard: newDraftBoard,
+          draftBoard: rebuiltBoard,
           myRoster: newMyRoster
         });
 
