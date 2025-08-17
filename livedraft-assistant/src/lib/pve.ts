@@ -1,5 +1,6 @@
-import { Player, Weights, RosterCounts, TierMetrics } from './types';
+import { Player, Weights, RosterCounts, TierMetrics, DraftedPlayer } from './types';
 import { hashData, minmax01 } from './util';
+import { getRoundAndPick } from './draftMath';
 
 export interface PVEResult {
   PPS: { [playerName: string]: number };
@@ -8,7 +9,7 @@ export interface PVEResult {
   flexPressure: number;
   scarcityMetrics: { [pos: string]: { count: number; urgency: number } };
   tierUrgency: { [playerName: string]: number };
-  availabilityRisk: { [playerName: string]: { risk: number; takeNow: boolean } };
+  availabilityRisk: { [playerName: string]: { risk: number; takeNow: boolean; makeItBack?: number } };
 }
 
 // Simple memo caches keyed by a light hash of remaining list
@@ -25,7 +26,9 @@ export function computePVE(
   availabilityS: number,
   picksUntilUser: number,
   currentOverall: number,
-  config: { teams: number; flexCount: 1 | 2; ppr: 'PPR' | 'Half PPR' | 'Standard' }
+  config: { teams: number; flexCount: 1 | 2; ppr: 'PPR' | 'Half PPR' | 'Standard' },
+  slot: number,
+  draftedAll: DraftedPlayer[]
 ): PVEResult {
   if (remaining.length === 0) {
     return {
@@ -56,16 +59,32 @@ export function computePVE(
   // 5. Compute Tier Urgency (dynamic per-position thresholds)
   const tierUrgencyRaw = computeTierUrgencyDynamic(remaining, currentOverall, config.teams);
   
-  // 6. Compute Availability Risk (use blended pick and phase-aware S)
-  const availabilityRaw = computeAvailabilityRisk(remaining, nextPicks, availabilityS, config.teams, currentOverall);
-
   // Normalize components to stabilize PPS across phases
   const marketValues = normalizePlayerMap(remaining, marketValuesRaw);
   const tierUrgency = normalizePlayerMap(remaining, tierUrgencyRaw);
-  const availabilityRisk = normalizeAvailability(remaining, availabilityRaw);
   const rosterNeeds = normalizePosMapToPlayers(remaining, rosterNeedsRaw);
   const scarcityMetrics = normalizeScarcityPos(remaining, scarcityRaw);
   
+  // 6. Compute Availability Risk (user-centric baseline) and opponent-aware make-it-back
+  const availabilityRaw = computeAvailabilityRisk(remaining, nextPicks, availabilityS, config.teams, currentOverall);
+  const makeItBack = computeOpponentMakeItBack(
+    remaining,
+    draftedAll,
+    config.teams,
+    slot,
+    currentOverall,
+    nextPicks[0],
+    marketValues,
+    tierUrgency,
+    scarcityMetrics,
+    weights,
+    { ppr: config.ppr, flexCount: config.flexCount }
+  );
+  // Attach makeItBack to availability map (do not normalize)
+  Object.keys(availabilityRaw).forEach(name => {
+    availabilityRaw[name].makeItBack = makeItBack[name] ?? undefined;
+  });
+
   // 7. Compute Player Priority Scores
   const PPS = computePPS(
     remaining,
@@ -75,7 +94,7 @@ export function computePVE(
     tierUrgency,
     rosterNeeds,
     scarcityMetrics,
-    availabilityRisk,
+    availabilityRaw,
     { ppr: config.ppr }
   );
   
@@ -276,8 +295,8 @@ function computeAvailabilityRisk(
   baseS: number,
   teams: number,
   currentOverall: number
-): { [playerName: string]: { risk: number; takeNow: boolean } } {
-  const result: { [playerName: string]: { risk: number; takeNow: boolean } } = {};
+): { [playerName: string]: { risk: number; takeNow: boolean; makeItBack?: number } } {
+  const result: { [playerName: string]: { risk: number; takeNow: boolean; makeItBack?: number } } = {};
   const nextPick = Math.min(...nextPicks);
   const totalPicksApprox = teams * 15;
   const phase = Math.max(0, Math.min(1, currentOverall / totalPicksApprox));
@@ -306,6 +325,105 @@ function computeAvailabilityRisk(
   return result;
 }
 
+function computeOpponentMakeItBack(
+  remaining: Player[],
+  drafted: DraftedPlayer[],
+  teams: number,
+  userSlot: number,
+  currentOverall: number,
+  nextUserPickOverall: number,
+  marketValues: { [player: string]: number },
+  tierUrgency: { [player: string]: number },
+  scarcity: { [pos: string]: { count: number; urgency: number } },
+  weights: Weights,
+  config: { ppr: 'PPR' | 'Half PPR' | 'Standard'; flexCount: 1 | 2 }
+): { [playerName: string]: number } {
+  const start = currentOverall;
+  const end = Math.max(currentOverall, nextUserPickOverall - 1);
+  if (end < start) {
+    const out: { [name: string]: number } = {};
+    remaining.forEach(p => { out[p.player] = 1; });
+    return out; // no intervening picks
+  }
+
+  // Build team rosters from drafted history
+  const rosters: Record<number, RosterCounts> = {};
+  for (let t = 1; t <= teams; t++) {
+    rosters[t] = { QB: 0, RB: 0, WR: 0, TE: 0, DEF: 0, K: 0, total: 0 };
+  }
+  drafted.forEach(d => {
+    const odd = d.round % 2 === 1;
+    const col = odd ? d.pick : (teams - d.pick + 1);
+    const pos = d.pos as keyof RosterCounts;
+    if (pos && rosters[col]) {
+      if (pos === 'QB' || pos === 'RB' || pos === 'WR' || pos === 'TE' || pos === 'DEF' || pos === 'K') {
+        (rosters[col][pos] as number)++;
+        rosters[col].total++;
+      }
+    }
+  });
+
+  // Determine intervening team slots between now and next user pick
+  const interveningTeams: number[] = [];
+  for (let ov = start; ov <= end; ov++) {
+    const { round, pickInRound } = getRoundAndPick(ov, teams);
+    const isOdd = round % 2 === 1;
+    const col = isOdd ? pickInRound : (teams - pickInRound + 1);
+    if (col !== userSlot) interveningTeams.push(col);
+  }
+
+  const out: { [name: string]: number } = {};
+  remaining.forEach(p => { out[p.player] = 1; });
+
+  // Precompute per-position scarcity urgency
+  const posUrgency: Record<string, number> = {};
+  Object.keys(scarcity).forEach(pos => { posUrgency[pos] = scarcity[pos]?.urgency ?? 0; });
+
+  // For each intervening team, compute a softmax over candidate players
+  const tau = 0.4; // temperature
+  interveningTeams.forEach(teamSlot => {
+    const { rosterNeeds: needs } = computeRosterNeeds(rosters[teamSlot], { flexCount: config.flexCount, ppr: config.ppr });
+    // Build scores for candidates
+    const scores: number[] = [];
+    const names: string[] = [];
+    const positions: (string | undefined)[] = [];
+    for (let i = 0; i < remaining.length; i++) {
+      const p = remaining[i];
+      const pos = p.pos || '';
+      names.push(p.player);
+      positions.push(pos);
+      const mv = marketValues[p.player] || 0;
+      const tu = tierUrgency[p.player] || 0;
+      const sc = pos ? (posUrgency[pos] || 0) : 0;
+      const need = pos ? (needs[pos] || 0) : 0;
+      let score = 0;
+      score += weights.w_value * mv;
+      score += weights.w_tier * tu;
+      score += weights.w_scar * sc;
+      score += weights.w_need * need;
+      if (config.ppr === 'PPR' && (pos === 'WR' || pos === 'TE')) score += 0.04;
+      else if (config.ppr === 'Half PPR' && (pos === 'WR' || pos === 'TE')) score += 0.02;
+      if (pos === 'RB' || pos === 'WR') score += 0.02;
+      if (p.isRookie) score += 0.03;
+      scores.push(Math.max(0, score));
+    }
+    // Select top K for softmax to reduce noise
+    const indices = scores.map((s, i) => [s, i] as [number, number]).sort((a, b) => b[0] - a[0]).slice(0, 40).map(pair => pair[1]);
+    const expVals = indices.map(i => Math.exp(scores[i] / Math.max(0.001, tau)));
+    const denom = expVals.reduce((s, v) => s + v, 0) || 1;
+    const probs = expVals.map(v => v / denom);
+    // Update make-it-back probabilities for these players
+    for (let j = 0; j < indices.length; j++) {
+      const idx = indices[j];
+      const name = names[idx];
+      const pPick = probs[j];
+      out[name] = out[name] * (1 - pPick);
+    }
+  });
+
+  return out;
+}
+
 function normalizePlayerMap(remaining: Player[], map: { [player: string]: number }): { [player: string]: number } {
   const vals = remaining.map(p => map[p.player] ?? 0);
   const scaled = minmax01(vals);
@@ -314,11 +432,11 @@ function normalizePlayerMap(remaining: Player[], map: { [player: string]: number
   return out;
 }
 
-function normalizeAvailability(remaining: Player[], map: { [player: string]: { risk: number; takeNow: boolean } }): { [player: string]: { risk: number; takeNow: boolean } } {
+function normalizeAvailability(remaining: Player[], map: { [player: string]: { risk: number; takeNow: boolean; makeItBack?: number } }): { [player: string]: { risk: number; takeNow: boolean; makeItBack?: number } } {
   const risks = remaining.map(p => map[p.player]?.risk ?? 0.5);
   const scaled = minmax01(risks);
-  const out: { [player: string]: { risk: number; takeNow: boolean } } = {};
-  remaining.forEach((p, i) => { out[p.player] = { risk: scaled[i], takeNow: map[p.player]?.takeNow ?? false }; });
+  const out: { [player: string]: { risk: number; takeNow: boolean; makeItBack?: number } } = {};
+  remaining.forEach((p, i) => { out[p.player] = { risk: scaled[i], takeNow: map[p.player]?.takeNow ?? false, makeItBack: map[p.player]?.makeItBack }; });
   return out;
 }
 
@@ -348,7 +466,7 @@ function computePPS(
   tierUrgency: { [playerName: string]: number },
   rosterNeeds: { [pos: string]: number },
   scarcityMetrics: { [pos: string]: { count: number; urgency: number } },
-  availabilityRisk: { [playerName: string]: { risk: number; takeNow: boolean } },
+  availabilityRisk: { [playerName: string]: { risk: number; takeNow: boolean; makeItBack?: number } },
   config: { ppr: 'PPR' | 'Half PPR' | 'Standard' }
 ): { [playerName: string]: number } {
   const result: { [playerName: string]: number } = {};

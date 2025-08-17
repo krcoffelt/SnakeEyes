@@ -402,7 +402,9 @@ export const useDraftStore = create<DraftStore>()(
           availabilityS,
           picksUntilUser,
           currentOverall,
-          { teams: config.teams, flexCount: config.flexCount, ppr: config.ppr }
+          { teams: config.teams, flexCount: config.flexCount, ppr: config.ppr },
+          config.slot,
+          get().drafted
         );
 
         set({
