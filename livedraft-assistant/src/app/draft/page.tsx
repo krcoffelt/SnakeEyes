@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDraftStore } from '../../store/draftStore';
 import Header from '../../components/Header';
@@ -8,18 +8,20 @@ import DraftBoard from '../../components/DraftBoard';
 import LiveRecommendations from '../../components/LiveRecommendations';
 import PlayerSearch from '../../components/PlayerSearch';
 import MyRoster from '../../components/MyRoster';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { getCurrentOverallPick, getRoundAndPick, nextTwoUserPicks } from '../../lib/draftMath';
 
 export default function DraftPage() {
   const router = useRouter();
-  const { loadData, config, loading, error, clearError, resetDraft } = useDraftStore(s => ({
+  const { loadData, config, loading, error, clearError, resetDraft, drafted } = useDraftStore(s => ({
     loadData: s.loadData,
     config: s.config,
     loading: s.loading,
     error: s.error,
     clearError: s.clearError,
-    resetDraft: s.resetDraft
-  }), (a, b) => a.config === b.config && a.loading === b.loading && a.error === b.error);
+    resetDraft: s.resetDraft,
+    drafted: s.drafted,
+  }));
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
@@ -35,6 +37,21 @@ export default function DraftPage() {
 
   const toggleTheme = () => { setTheme(prev => prev === 'light' ? 'dark' : 'light'); };
   const goBackToSetup = () => { router.push('/'); };
+
+  const { overall, round, pickInRound, nextPicks } = useMemo(() => {
+    const overallNow = getCurrentOverallPick(drafted.length);
+    const { round, pickInRound } = getRoundAndPick(overallNow, config.teams);
+    const nextPicks = nextTwoUserPicks(overallNow, config.slot, config.teams);
+    return { overall: overallNow, round, pickInRound, nextPicks };
+  }, [drafted.length, config.teams, config.slot]);
+
+  const jumpToMyNextPick = () => {
+    const nextOverall = nextPicks[0];
+    const { round, pickInRound } = getRoundAndPick(nextOverall, config.teams);
+    // Scroll to the DraftBoard area; DraftBoard already autoscrolls rounds, so this focuses attention
+    const board = document.querySelector('#live-draft-board');
+    if (board) board.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -77,6 +94,26 @@ export default function DraftPage() {
         </div>
       </div>
 
+      {/* Sticky context bar */}
+      <div className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600 dark:text-gray-400">Current</span>
+              <span className="font-semibold text-gray-900 dark:text-white">Round {round}</span>
+              <span className="font-semibold text-gray-900 dark:text-white">Pick {pickInRound}</span>
+              <span className="text-gray-600 dark:text-gray-400">Overall #{overall}</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600 dark:text-gray-400">My next picks:</span>
+              <span className="font-medium text-gray-900 dark:text-white">#{nextPicks[0]}</span>
+              <span className="font-medium text-gray-900 dark:text-white">#{nextPicks[1]}</span>
+              <button onClick={jumpToMyNextPick} className="px-3 py-1 rounded-md bg-purple-600 hover:bg-purple-700 text-white">Jump</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Top Row - My Roster and Quick Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
@@ -89,15 +126,15 @@ export default function DraftPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Round:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">1</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{round}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Pick:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">#{config.slot}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{pickInRound}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Overall:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{config.slot}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{overall}</span>
                 </div>
               </div>
             </div>
@@ -107,7 +144,9 @@ export default function DraftPage() {
         {/* Main Draft Area - Full Width Layout */}
         <div className="space-y-6">
           {/* Draft Board - Full Width at Top */}
-          <DraftBoard />
+          <div id="live-draft-board">
+            <DraftBoard />
+          </div>
           
           {/* Player Table and Recommendations - Side by Side */}
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
