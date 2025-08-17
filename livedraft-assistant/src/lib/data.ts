@@ -108,49 +108,79 @@ export async function loadSleeper(): Promise<Player[]> {
 /** Load Ron rankings data */
 export async function loadRon(): Promise<RonRecord[]> {
   const data = await fetchCsv<CSVData>('/data/Ron_Rankings.csv');
+  
   const rows = data
     .map(row => {
       const keys = Object.keys(row);
-      const normKey = (k: string) => k.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const findKey = (preds: string[]): string | undefined => {
-        // exact first, then contains
-        const exact = keys.find(k => preds.includes(normKey(k)));
-        if (exact) return exact;
-        return keys.find(k => preds.some(p => normKey(k).includes(p)));
-      };
-
-      const tierKey = findKey(['valuetiers', 'tier']);
-      const nameKey = findKey(['name', 'player']);
-      const rankKey = findKey(['rank']);
-      const posKey = findKey(['pos']);
-      const posRankKey = findKey(['posrk', 'posrank']);
-      const idKey = findKey(['id']);
-      const targetKey = findKey(['targetround', 'targetrnd', 'target']);
+      
+      // Handle the malformed CSV structure - the Rank column might be misaligned due to extra commas
+      // Look for the Rank column more carefully
+      let rankKey = keys.find(k => k.toLowerCase() === 'rank');
+      let nameKey = keys.find(k => k.toLowerCase() === 'name');
+      let idKey = keys.find(k => k.toLowerCase() === 'id');
+      let posKey = keys.find(k => k.toLowerCase() === 'pos.');
+      let tierKey = keys.find(k => k.toLowerCase().includes('tier'));
+      
+      // If we can't find the expected keys, try to infer from the data structure
+      if (!rankKey || !nameKey) {
+        console.warn('Could not find expected columns, attempting to infer structure');
+        // Look for numeric values that could be ranks
+        for (const key of keys) {
+          const value = row[key];
+          if (typeof value === 'string' && /^\d+$/.test(value.trim()) && !rankKey) {
+            rankKey = key;
+            console.log('Inferred rank column:', key);
+          }
+        }
+      }
 
       const tierRaw = String((tierKey ? row[tierKey] : '') || '').trim();
       if (!tierRaw && !nameKey && !rankKey) return null;
 
       const name = String((nameKey ? row[nameKey] : '') || '').trim();
       if (!name) return null;
-      const rank = safeParseNumber(rankKey ? row[rankKey] : undefined);
+      
+      // Parse rank more carefully
+      let rank: number | null = null;
+      if (rankKey) {
+        const rawRank = row[rankKey];
+        if (rawRank !== undefined && rawRank !== null && rawRank !== '') {
+          rank = safeParseNumber(rawRank);
+        }
+      }
+      
+      // If we still don't have a rank, try to find it in other columns
+      if (rank === null) {
+        for (const key of keys) {
+          const value = row[key];
+          if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+            const parsed = safeParseNumber(value);
+            if (parsed !== null && parsed > 0 && parsed <= 200) { // Reasonable rank range
+              rank = parsed;
+              break;
+            }
+          }
+        }
+      }
+      
       const pos = String((posKey ? row[posKey] : '') || '').trim();
-      const posRank = safeParseNumber(posRankKey ? row[posRankKey] : undefined);
       const id = String((idKey ? row[idKey] : '') || '').trim();
-      const targetRound = safeParseNumber(targetKey ? row[targetKey] : undefined);
       const tierNumMatch = tierRaw.match(/tier\s*(\d+)/i);
       const ron_tier = tierNumMatch ? Number(tierNumMatch[1]) : null;
+      
       const rec: RonRecord = {
         ron_id: id || undefined,
         name,
         ron_rank: rank ?? undefined,
         ron_pos: pos || undefined,
-        ron_pos_rank: posRank ?? undefined,
+        ron_pos_rank: undefined, // Not available in this CSV
         ron_tier: ron_tier ?? undefined,
-        ron_target_round_12: targetRound ?? undefined
+        ron_target_round_12: undefined // Not available in this CSV
       };
       return rec;
     })
     .filter(Boolean) as RonRecord[];
+  
   return rows;
 }
 
