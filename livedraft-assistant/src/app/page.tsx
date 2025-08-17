@@ -30,17 +30,20 @@ export default function LeagueSetup() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden" style={{ background: 'transparent' }}>
       {/* Gradient Background with Noise */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-gray-700"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-700 to-gray-500"></div>
       
       {/* Noise Overlay */}
       <div 
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-30"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
       ></div>
+      
+      {/* Additional subtle gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
       
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center p-4 min-h-screen">
