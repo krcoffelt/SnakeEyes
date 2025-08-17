@@ -221,16 +221,20 @@ export const useDraftStore = create<DraftStore>()(
           bye: player.bye || undefined,
           isRookie: player.isRookie || false,
           round,
-          pick,
+          pick, // pick sequence within round (1..teams)
           overall,
           draftedBy,
           timestamp: new Date()
         };
 
-        // Update draft board
+        // Compute team column for snake direction
+        const isOddRound = round % 2 === 1;
+        const teamColumn = isOddRound ? pick : (config.teams - pick + 1);
+
+        // Update draft board using team column index
         const newDraftBoard = { ...draftBoard };
         if (!newDraftBoard[round]) newDraftBoard[round] = {};
-        newDraftBoard[round][pick] = draftedPlayer;
+        newDraftBoard[round][teamColumn] = draftedPlayer;
 
         // Update remaining players - filter from remaining, not all players
         const newRemaining = remaining.filter(p => p.player !== playerName);
@@ -258,7 +262,7 @@ export const useDraftStore = create<DraftStore>()(
       },
 
       undo: () => {
-        const { drafted, players } = get();
+        const { drafted, players, config } = get();
         if (drafted.length === 0) return;
 
         const lastDrafted = drafted[drafted.length - 1];
@@ -282,10 +286,12 @@ export const useDraftStore = create<DraftStore>()(
           newMyRoster.total--;
         }
 
-        // Update draft board
+        // Update draft board - delete using team column index
         const newDraftBoard = { ...get().draftBoard };
+        const isOddRound = lastDrafted.round % 2 === 1;
+        const teamColumn = isOddRound ? lastDrafted.pick : (config.teams - lastDrafted.pick + 1);
         if (newDraftBoard[lastDrafted.round]) {
-          delete newDraftBoard[lastDrafted.round][lastDrafted.pick];
+          delete newDraftBoard[lastDrafted.round][teamColumn];
         }
 
         set({
