@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useDraftStore } from '../store/draftStore';
-import { Search, Filter, User, Users, ChevronUp, ChevronDown } from 'lucide-react';
+import { Search, Filter, User, Users, ChevronUp, ChevronDown, Plus } from 'lucide-react';
 
 export default function PlayerSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -105,173 +105,175 @@ export default function PlayerSearch() {
   const sortedPlayers = getSortedPlayers();
   
   return (
-    <div className="sleeper-card p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
-        <div className="w-6 h-6 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
-          <Search className="h-4 w-4 text-green-600 dark:text-green-400" />
+    <div className="w-full">
+      {/* Search and Filters */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <div className="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
+            <Search className="h-3 w-3 text-green-600 dark:text-green-400" />
+          </div>
+          Player Search & Filters
+        </h2>
+        
+        {/* Search Input */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Find player..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="sleeper-input pl-10"
+          />
         </div>
-        Player Search & Board
-      </h2>
-      
-      {/* Search Input */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search players..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="sleeper-input pl-10"
-        />
-      </div>
-      
-      {/* Position Filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={() => setSelectedPosition('')}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            !selectedPosition
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          All
-        </button>
-        {positions.map(pos => (
+        
+        {/* Position Filters */}
+        <div className="flex flex-wrap gap-2 mb-4">
           <button
-            key={pos}
-            onClick={() => setSelectedPosition(pos)}
+            onClick={() => setSelectedPosition('')}
             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              selectedPosition === pos
+              !selectedPosition
                 ? 'bg-purple-600 text-white'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
-            {pos}
+            All {remaining.length}/15
           </button>
-        ))}
+          {positions.map(pos => {
+            const count = remaining.filter(p => p.pos === pos).length;
+            const required = pos === 'QB' || pos === 'TE' || pos === 'DEF' || pos === 'K' ? 1 : pos === 'FLEX' ? config.flexCount : 2;
+            return (
+              <button
+                key={pos}
+                onClick={() => setSelectedPosition(pos)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  selectedPosition === pos
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {pos} {count}/{required}
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Additional Filters */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setShowRookiesOnly(!showRookiesOnly)}
+            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              showRookiesOnly
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            {showRookiesOnly ? 'ROOKIES ONLY' : 'SHOW ROOKIES'}
+          </button>
+        </div>
       </div>
       
-      {/* Rookie Filter */}
-      <div className="mb-6">
-        <button
-          onClick={() => setShowRookiesOnly(!showRookiesOnly)}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            showRookiesOnly
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          {showRookiesOnly ? 'ROOKIES ONLY' : 'SHOW ROOKIES'}
-        </button>
-      </div>
-      
-      {/* Live Player Table */}
-      <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-          Available Players ({sortedPlayers.length})
-        </h3>
+      {/* Live Player Table - Sleeper Style */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Available Players ({sortedPlayers.length})
+          </h3>
+        </div>
         
         <div className="overflow-x-auto">
-          <table className="w-full sleeper-table">
+          <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300">
-                  Player
+                <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
+                  RK
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300">
-                  Pos
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300">
-                  Team
+                <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
+                  PLAYER
                 </th>
                 <th 
-                  className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
-                  onClick={() => handleSort('rank')}
-                >
-                  <div className="flex items-center">
-                    Und Rank
-                    {sortBy === 'rank' && (
-                      sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />
-                    )}
-                  </div>
-                </th>
-                <th 
-                  className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                   onClick={() => handleSort('adp')}
                 >
                   <div className="flex items-center">
-                    Und ADP
+                    ADP
                     {sortBy === 'adp' && (
                       sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />
                     )}
                   </div>
                 </th>
+                <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
+                  BYE
+                </th>
                 <th 
-                  className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                   onClick={() => handleSort('value')}
                 >
                   <div className="flex items-center">
-                    Value
+                    VALUE
                     {sortBy === 'value' && (
                       sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />
                     )}
                   </div>
                 </th>
-                <th className="text-left py-3 px-2 font-medium text-gray-700 dark:text-gray-300">
-                  Actions
+                <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
+                  ACTIONS
                 </th>
               </tr>
             </thead>
             <tbody>
-              {sortedPlayers.slice(0, 50).map((player, index) => (
+              {sortedPlayers.slice(0, 100).map((player, index) => (
                 <tr 
                   key={player.player} 
                   className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <td className="py-3 px-2">
+                  <td className="py-4 px-4">
                     <div className="flex items-center">
-                      <div className="font-medium text-gray-900 dark:text-white">
-                        {player.player}
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {player.und_rank || '-'}
+                      </span>
+                      <button className="ml-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors">
+                        <Plus className="h-3 w-3 text-gray-500" />
+                      </button>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <div className="flex items-center">
+                      <div>
+                        <div className="font-medium text-gray-900 dark:text-white">
+                          {player.player}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {player.pos} • {player.team || '-'}
+                        </div>
                       </div>
                       {player.isRookie && (
                         <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
-                          ROOKIE
+                          R
                         </span>
                       )}
                     </div>
-                    {player.bye && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        BYE: {player.bye}
-                      </div>
+                  </td>
+                  <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
+                    {player.und_adp ? player.und_adp.toFixed(1) : '-'}
+                  </td>
+                  <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
+                    {player.bye || '-'}
+                  </td>
+                  <td className="py-4 px-4">
+                    {player.value ? (
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        player.value > 0 
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                          : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+                      }`}>
+                        {player.value > 0 ? `+${player.value}` : player.value.toString()}
+                      </span>
+                    ) : (
+                      '-'
                     )}
                   </td>
-                  <td className="py-3 px-2">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      player.pos === 'QB' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200' :
-                      player.pos === 'RB' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' :
-                      player.pos === 'WR' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200' :
-                      player.pos === 'TE' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200' :
-                      player.pos === 'DEF' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200' :
-                      player.pos === 'K' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200' :
-                      'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                    }`}>
-                      {player.pos}
-                    </span>
-                  </td>
-                  <td className="py-3 px-2 text-gray-700 dark:text-gray-300">
-                    {player.team || '-'}
-                  </td>
-                  <td className="py-3 px-2 text-gray-700 dark:text-gray-300">
-                    {player.und_rank || '-'}
-                  </td>
-                  <td className="py-3 px-2 text-gray-700 dark:text-gray-300">
-                    {player.und_adp || '-'}
-                  </td>
-                  <td className="py-3 px-2 text-gray-700 dark:text-gray-300">
-                    {player.value ? (player.value > 0 ? `+${player.value}` : player.value.toString()) : '-'}
-                  </td>
-                  <td className="py-3 px-2">
+                  <td className="py-4 px-4">
                     <div className="flex space-x-1">
                       <button
                         onClick={() => quickDraft(player.player, 'me')}
@@ -295,70 +297,74 @@ export default function PlayerSearch() {
           </table>
         </div>
         
-        {sortedPlayers.length > 50 && (
-          <div className="text-center text-gray-500 dark:text-gray-400 py-4">
-            Showing first 50 players. Use search and filters to find specific players.
+        {sortedPlayers.length > 100 && (
+          <div className="p-4 text-center text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+            Showing first 100 players. Use search and filters to find specific players.
           </div>
         )}
       </div>
       
       {/* Search Results (for quick access) */}
       {searchTerm && (
-        <div className="mb-6">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-            Quick Search Results
-          </h3>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {filteredPlayers.map(player => (
-              <div
-                key={player.player}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                onClick={() => {
-                  setSelectedPlayer(player.player);
-                  setShowDraftModal(true);
-                }}
-              >
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900 dark:text-white">
-                    {player.player}
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              Quick Search Results
+            </h3>
+          </div>
+          <div className="p-4">
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {filteredPlayers.map(player => (
+                <div
+                  key={player.player}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setSelectedPlayer(player.player);
+                    setShowDraftModal(true);
+                  }}
+                >
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 dark:text-white">
+                      {player.player}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {player.pos} • {player.team} • Und: {player.und_rank} • SLP: {player.slp_rank}
+                      {player.bye && ` • BYE: ${player.bye}`}
+                      {player.isRookie && (
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                          ROOKIE
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {player.pos} • {player.team} • Und: {player.und_rank} • SLP: {player.slp_rank}
-                    {player.bye && ` • BYE: ${player.bye}`}
-                    {player.isRookie && (
-                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
-                        ROOKIE
-                      </span>
-                    )}
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        quickDraft(player.player, 'me');
+                      }}
+                      className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
+                    >
+                      <User className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        quickDraft(player.player, 'opp');
+                      }}
+                      className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                    >
+                      <Users className="h-3 w-3" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex space-x-1">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      quickDraft(player.player, 'me');
-                    }}
-                    className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
-                  >
-                    <User className="h-3 w-3" />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      quickDraft(player.player, 'opp');
-                    }}
-                    className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
-                  >
-                    <Users className="h-3 w-3" />
-                  </button>
+              ))}
+              {filteredPlayers.length === 0 && (
+                <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+                  No players found matching &quot;{searchTerm}&quot;
                 </div>
-              </div>
-            ))}
-            {filteredPlayers.length === 0 && (
-              <div className="text-center text-gray-500 dark:text-gray-400 py-4">
-                No players found matching &quot;{searchTerm}&quot;
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -420,7 +426,7 @@ export default function PlayerSearch() {
                     className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                       draftBy === 'opp'
                         ? 'bg-red-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        : 'bg-gray-700 dark:bg-gray-600 text-gray-300'
                     }`}
                   >
                     Opponent

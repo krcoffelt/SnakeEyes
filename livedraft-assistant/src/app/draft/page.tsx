@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDraftStore } from '../../store/draftStore';
@@ -15,29 +16,18 @@ export default function DraftPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
-    // Load data on mount
     loadData();
-    
-    // Check for saved theme
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
+    if (savedTheme) { setTheme(savedTheme); }
   }, [loadData]);
 
   useEffect(() => {
-    // Apply theme to document
     document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
-
-  const goBackToSetup = () => {
-    router.push('/');
-  };
+  const toggleTheme = () => { setTheme(prev => prev === 'light' ? 'dark' : 'light'); };
+  const goBackToSetup = () => { router.push('/'); };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -46,10 +36,7 @@ export default function DraftPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button
-                onClick={goBackToSetup}
-                className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
+              <button onClick={goBackToSetup} className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back to Setup</span>
               </button>
@@ -63,18 +50,11 @@ export default function DraftPage() {
                 </p>
               </div>
             </div>
-            
             <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
+              <button onClick={toggleTheme} className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                 {theme === 'dark' ? '☀️' : '🌙'}
               </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium"
-              >
+              <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
                 Reset Draft
               </button>
             </div>
@@ -109,21 +89,19 @@ export default function DraftPage() {
           </div>
         </div>
 
-        {/* Main Draft Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-6">
-          {/* Left Sidebar - Player Search */}
-          <div className="xl:col-span-1">
-            <PlayerSearch />
-          </div>
-
-          {/* Center - Draft Board */}
-          <div className="xl:col-span-2">
-            <DraftBoard />
-          </div>
-
-          {/* Right Sidebar - Live Recommendations */}
-          <div className="xl:col-span-1">
-            <LiveRecommendations />
+        {/* Main Draft Area - Full Width Layout */}
+        <div className="space-y-6">
+          {/* Draft Board - Full Width at Top */}
+          <DraftBoard />
+          
+          {/* Player Search and Table - Full Width Below */}
+          <PlayerSearch />
+          
+          {/* Recommendations Panel - Right Side */}
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div className="xl:col-span-1">
+              <LiveRecommendations />
+            </div>
           </div>
         </div>
       </main>
