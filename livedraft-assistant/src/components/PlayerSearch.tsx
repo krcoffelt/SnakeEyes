@@ -24,11 +24,11 @@ export default function PlayerSearch() {
   const [draftRound, setDraftRound] = useState(1);
   const [draftPick, setDraftPick] = useState(1);
   const [draftBy, setDraftBy] = useState<'me' | 'opp'>('opp');
-  const [sortBy, setSortBy] = useState<'rank' | 'und_adp' | 'slp_rank' | 'value'>('rank');
+  const [sortBy, setSortBy] = useState<'rank' | 'und_adp' | 'slp_rank' | 'value' | 'mib'>('rank');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [visiblePlayers, setVisiblePlayers] = useState({ start: 0, end: 10 });
   
-  const { remaining, config, draft } = useDraftStore();
+  const { remaining, config, draft, availabilityRisk } = useDraftStore();
   const debouncedSearch = useDebounced(searchTerm, 200);
   
   const positions = ['QB', 'RB', 'WR', 'TE', 'DEF', 'K'];
@@ -55,19 +55,24 @@ export default function PlayerSearch() {
         case 'und_adp': aValue = a.und_adp || 999; bValue = b.und_adp || 999; break;
         case 'slp_rank': aValue = a.slp_rank || 999; bValue = b.slp_rank || 999; break;
         case 'value': aValue = a.value || 0; bValue = b.value || 0; break;
+        case 'mib': {
+          const aM = (availabilityRisk as any)[a.player]?.makeItBack ?? 0;
+          const bM = (availabilityRisk as any)[b.player]?.makeItBack ?? 0;
+          aValue = aM; bValue = bM; break;
+        }
         default: aValue = a.und_rank || 999; bValue = b.und_rank || 999;
       }
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     });
     return sorted;
-  }, [remaining, selectedPosition, showRookiesOnly, debouncedSearch, sortBy, sortDirection]);
+  }, [remaining, selectedPosition, showRookiesOnly, debouncedSearch, sortBy, sortDirection, availabilityRisk]);
 
   const canScrollUp = visiblePlayers.start > 0;
   const sortedPlayers = sortedPlayersMemo;
   const canScrollDown = visiblePlayers.end < sortedPlayers.length;
   const visiblePlayerSet = sortedPlayers.slice(visiblePlayers.start, visiblePlayers.end);
   
-  const handleSort = (column: 'rank' | 'und_adp' | 'slp_rank' | 'value') => {
+  const handleSort = (column: 'rank' | 'und_adp' | 'slp_rank' | 'value' | 'mib') => {
     if (sortBy === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -269,6 +274,17 @@ export default function PlayerSearch() {
                     )}
                   </div>
                 </th>
+                <th 
+                  className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('mib')}
+                >
+                  <div className="flex items-center">
+                    MIB %
+                    {sortBy === 'mib' && (
+                      sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />
+                    )}
+                  </div>
+                </th>
                 <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
                   BYE
                 </th>
@@ -331,6 +347,11 @@ export default function PlayerSearch() {
                     ) : (
                       '-'
                     )}
+                  </td>
+                  <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
+                    {(availabilityRisk as any)[player.player]?.makeItBack != null
+                      ? `${Math.round(((availabilityRisk as any)[player.player]?.makeItBack as number) * 100)}%`
+                      : '-'}
                   </td>
                   <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
                     {player.bye || '-'}
