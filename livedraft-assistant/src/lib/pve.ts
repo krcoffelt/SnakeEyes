@@ -364,7 +364,7 @@ function computeAvailabilityRisk(
   const nextPick = Math.min(...nextPicks);
   const totalPicksApprox = teams * 15;
   const phase = Math.max(0, Math.min(1, currentOverall / totalPicksApprox));
-  let s = baseS + Math.round(4 * phase);
+  const s = baseS + Math.round(4 * phase);
   remaining.forEach(player => {
     const bp = blendedPick(player);
     if (bp === null) { result[player.player] = { risk: 0.5, takeNow: false }; return; }
