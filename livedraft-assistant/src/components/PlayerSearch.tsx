@@ -15,10 +15,12 @@ export default function PlayerSearch() {
   const [draftBy, setDraftBy] = useState<'me' | 'opp'>('opp');
   const [sortBy, setSortBy] = useState<'rank' | 'adp' | 'value'>('rank');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [visiblePlayers, setVisiblePlayers] = useState({ start: 0, end: 10 });
   
   const { remaining, config, draft } = useDraftStore();
   
   const positions = ['QB', 'RB', 'WR', 'TE', 'DEF', 'K'];
+  const playersToShow = 10; // Number of players visible at once
   
   const filteredPlayers = remaining.filter(player => {
     const matchesSearch = player.player.toLowerCase().includes(searchTerm.toLowerCase());
@@ -83,7 +85,29 @@ export default function PlayerSearch() {
       setSortBy(column);
       setSortDirection('asc');
     }
+    // Reset to first page when sorting
+    setVisiblePlayers({ start: 0, end: playersToShow });
   };
+  
+  const scrollUp = () => {
+    setVisiblePlayers(prev => ({
+      start: Math.max(0, prev.start - playersToShow),
+      end: Math.max(playersToShow, prev.end - playersToShow)
+    }));
+  };
+  
+  const scrollDown = () => {
+    const sortedPlayers = getSortedPlayers();
+    setVisiblePlayers(prev => ({
+      start: Math.min(sortedPlayers.length - playersToShow, prev.start + playersToShow),
+      end: Math.min(sortedPlayers.length, prev.end + playersToShow)
+    }));
+  };
+  
+  const canScrollUp = visiblePlayers.start > 0;
+  const sortedPlayers = getSortedPlayers();
+  const canScrollDown = visiblePlayers.end < sortedPlayers.length;
+  const visiblePlayerSet = sortedPlayers.slice(visiblePlayers.start, visiblePlayers.end);
   
   const handleDraft = () => {
     if (selectedPlayer) {
@@ -101,8 +125,6 @@ export default function PlayerSearch() {
     draft(playerName, round, pick, who);
     setSearchTerm('');
   };
-  
-  const sortedPlayers = getSortedPlayers();
   
   return (
     <div className="w-full">
@@ -176,9 +198,44 @@ export default function PlayerSearch() {
       {/* Live Player Table - Sleeper Style */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Available Players ({sortedPlayers.length})
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Available Players ({sortedPlayers.length})
+            </h3>
+            
+            {/* Scroll Controls */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                Players {visiblePlayers.start + 1}-{Math.min(visiblePlayers.end, sortedPlayers.length)} of {sortedPlayers.length}
+              </span>
+              <div className="flex space-x-1">
+                <button
+                  onClick={scrollUp}
+                  disabled={!canScrollUp}
+                  className={`p-2 rounded-lg transition-colors ${
+                    canScrollUp
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                  }`}
+                  title="Scroll up"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={scrollDown}
+                  disabled={!canScrollDown}
+                  className={`p-2 rounded-lg transition-colors ${
+                    canScrollDown
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                  }`}
+                  title="Scroll down"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div className="overflow-x-auto">
@@ -222,7 +279,7 @@ export default function PlayerSearch() {
               </tr>
             </thead>
             <tbody>
-              {sortedPlayers.slice(0, 100).map((player, index) => (
+              {visiblePlayerSet.map((player, index) => (
                 <tr 
                   key={player.player} 
                   className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -297,9 +354,9 @@ export default function PlayerSearch() {
           </table>
         </div>
         
-        {sortedPlayers.length > 100 && (
+        {sortedPlayers.length > playersToShow && (
           <div className="p-4 text-center text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
-            Showing first 100 players. Use search and filters to find specific players.
+            Showing {visiblePlayers.start + 1}-{Math.min(visiblePlayers.end, sortedPlayers.length)} of {sortedPlayers.length} players. Use scroll controls to navigate.
           </div>
         )}
       </div>
