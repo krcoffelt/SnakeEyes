@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDraftStore } from '../store/draftStore';
-import { Trophy, Users, Target, Zap, ArrowRight } from 'lucide-react';
+import { Users, Target, Zap, ArrowRight } from 'lucide-react';
 
 export default function LeagueSetup() {
   const router = useRouter();
@@ -113,7 +113,7 @@ export default function LeagueSetup() {
                   {['Standard', 'Half PPR', 'PPR'].map((scoring) => (
                     <button
                       key={scoring}
-                      onClick={() => setLeagueSettings(prev => ({ ...prev, ppr: scoring as any }))}
+                      onClick={() => setLeagueSettings(prev => ({ ...prev, ppr: scoring as 'Standard' | 'Half PPR' | 'PPR' }))}
                       className={`p-3 rounded-xl border-2 transition-all ${
                         leagueSettings.ppr === scoring
                           ? 'border-orange-400 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'

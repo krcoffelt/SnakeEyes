@@ -12,7 +12,7 @@ import { ArrowLeft, Settings } from 'lucide-react';
 
 export default function DraftPage() {
   const router = useRouter();
-  const { loadData, config, resetDraft } = useDraftStore();
+  const { loadData, config, loading, error, clearError } = useDraftStore();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
@@ -28,10 +28,17 @@ export default function DraftPage() {
 
   const toggleTheme = () => { setTheme(prev => prev === 'light' ? 'dark' : 'light'); };
   const goBackToSetup = () => { router.push('/'); };
-  const handleResetDraft = () => { resetDraft(); };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {loading && (
+        <div className="w-full bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-center py-2 text-sm">Loading player data…</div>
+      )}
+      {error && (
+        <div className="w-full bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 text-center py-2 text-sm">
+          {error} <button onClick={() => { clearError(); loadData(); }} className="underline ml-2">Retry</button>
+        </div>
+      )}
       {/* Header with Back Button */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -55,7 +62,7 @@ export default function DraftPage() {
               <button onClick={toggleTheme} className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                 {theme === 'dark' ? '☀️' : '🌙'}
               </button>
-              <button onClick={handleResetDraft} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
+              <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
                 Reset Draft
               </button>
             </div>

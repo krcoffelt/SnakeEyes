@@ -50,7 +50,7 @@ export function minmax01(x: number[]): number[] {
 /**
  * Generate a hash of data for persistence invalidation
  */
-export function hashData(data: any): string {
+export function hashData(data: unknown): string {
   const str = JSON.stringify(data);
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -64,10 +64,10 @@ export function hashData(data: any): string {
 /**
  * Safely parse numeric values from CSV
  */
-export function safeParseNumber(value: any): number | null {
+export function safeParseNumber(value: unknown): number | null {
   if (value === null || value === undefined || value === '') return null;
   const parsed = Number(value);
-  return isNaN(parsed) ? null : parsed;
+  return Number.isNaN(parsed) ? null : parsed;
 }
 
 /**

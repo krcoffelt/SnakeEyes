@@ -3,6 +3,7 @@
 import React from 'react';
 import { useDraftStore } from '../store/draftStore';
 import { TrendingUp, Target, Users, Trophy } from 'lucide-react';
+import { Player } from '../lib/types';
 
 export default function LiveRecommendations() {
   const { 
@@ -23,26 +24,27 @@ export default function LiveRecommendations() {
   const currentOverall = drafted.length + 1;
   const maxEligible = currentOverall + config.teams; // within next round
 
-  const getTopRecommendations = () => {
+  type Rec = Player & { value: number; pps: number };
+
+  const getTopRecommendations = (): Rec[] => {
     // Only show players with positive value and within current window
     const playersWithPositiveValue = remaining
       .filter(player => {
-        if (!player.und_adp || !player.slp_rank) return false;
+        if (player.und_adp == null || player.slp_rank == null) return false;
         const value = player.slp_rank - player.und_adp;
         if (value <= 0) return false;
         const ref = player.und_adp ?? player.slp_rank; // use Underdog ADP primarily
         return ref <= maxEligible; // relevant to current pick window
       })
-      .map(player => ({
+      .map<Rec>(player => ({
         ...player,
-        value: player.slp_rank! - player.und_adp!,
+        value: (player.slp_rank as number) - (player.und_adp as number),
         pps: PPS[player.player] || 0
       }))
       .sort((a, b) => {
         if (b.value !== a.value) return b.value - a.value; // higher value first
-        // Give slight preference to closer-to-current picks
-        const aDist = Math.abs((a.und_adp ?? a.slp_rank ?? 999) - currentOverall);
-        const bDist = Math.abs((b.und_adp ?? b.slp_rank ?? 999) - currentOverall);
+        const aDist = Math.abs(((a.und_adp ?? a.slp_rank) as number) - currentOverall);
+        const bDist = Math.abs(((b.und_adp ?? b.slp_rank) as number) - currentOverall);
         if (aDist !== bDist) return aDist - bDist;
         return b.pps - a.pps;
       })
@@ -51,17 +53,17 @@ export default function LiveRecommendations() {
     return playersWithPositiveValue;
   };
 
-  const getRecommendationReason = (player: any) => {
-    const reasons = [] as string[];
+  const getRecommendationReason = (player: Rec): string => {
+    const reasons: string[] = [];
     reasons.push(`+${player.value} value`);
-    if (rosterNeeds[player.pos]) reasons.push(`Need ${player.pos}`);
+    if (rosterNeeds[player.pos || '']) reasons.push(`Need ${player.pos}`);
     if (tierUrgency[player.player]) reasons.push('Tier cliff');
-    if (scarcityMetrics[player.pos]?.urgency > 0.7) reasons.push('Scarce position');
+    if (player.pos && scarcityMetrics[player.pos]?.urgency > 0.7) reasons.push('Scarce position');
     if (availabilityRisk[player.player]?.takeNow) reasons.push('Take now');
     return reasons.slice(0, 2).join(' • ') || `+${player.value} value`;
   };
 
-  const getPriorityLevel = (player: any) => {
+  const getPriorityLevel = (player: Rec) => {
     const value = player.value;
     if (value >= 20) return { level: 'Steal', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' };
     if (value >= 10) return { level: 'Great Value', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200' };

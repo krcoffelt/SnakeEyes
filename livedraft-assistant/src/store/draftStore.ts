@@ -31,6 +31,8 @@ interface DraftStore {
   positionFilter: string;
   valueThreshold: number;
   sortBy: 'PPS' | 'Value' | 'BlendRank';
+  loading: boolean;
+  error?: string;
 
   loadData: () => Promise<void>;
   draft: (playerName: string, round: number, pick: number, draftedBy: 'me' | 'opp') => void;
@@ -48,6 +50,7 @@ interface DraftStore {
   recompute: () => void;
   exportCSV: () => void;
   exportSettings: () => void;
+  clearError: () => void;
 }
 
 // Function to automatically calculate optimal PVE weights based on league settings
@@ -192,9 +195,12 @@ export const useDraftStore = create<DraftStore>()(
       positionFilter: '',
       valueThreshold: 0,
       sortBy: 'PPS',
+      loading: false,
+      error: undefined,
 
       loadData: async () => {
         try {
+          set({ loading: true, error: undefined });
           const { players, dataHash } = await loadAllPlayerData();
           const currentHash = get().dataHash;
           
@@ -202,8 +208,10 @@ export const useDraftStore = create<DraftStore>()(
             set({ players, remaining: players, dataHash });
             get().recompute();
           }
+          set({ loading: false });
         } catch (error) {
           console.error('Failed to load data:', error);
+          set({ loading: false, error: 'Failed to load player data. Please check your CSV files.' });
         }
       },
 
@@ -240,7 +248,7 @@ export const useDraftStore = create<DraftStore>()(
         const newRemaining = remaining.filter(p => p.player !== playerName);
 
         // Update my roster if I drafted the player
-        let newMyRoster = { ...get().myRoster };
+        const newMyRoster = { ...get().myRoster };
         if (draftedBy === 'me' && player.pos) {
           if (player.pos === 'QB') newMyRoster.QB++;
           else if (player.pos === 'RB') newMyRoster.RB++;
@@ -275,7 +283,7 @@ export const useDraftStore = create<DraftStore>()(
         const newRemaining = [...get().remaining, playerToRestore];
 
         // Update my roster
-        let newMyRoster = { ...get().myRoster };
+        const newMyRoster = { ...get().myRoster };
         if (lastDrafted.draftedBy === 'me' && lastDrafted.pos) {
           if (lastDrafted.pos === 'QB') newMyRoster.QB--;
           else if (lastDrafted.pos === 'RB') newMyRoster.RB--;
@@ -369,11 +377,13 @@ export const useDraftStore = create<DraftStore>()(
           )
         );
 
+        const currentOverall = getCurrentOverallPick(get().drafted.length);
         const nextPicks = nextTwoUserPicks(
-          getCurrentOverallPick(get().drafted.length),
+          currentOverall,
           config.slot,
           config.teams
         );
+        const picksUntilUser = Math.max(0, nextPicks[0] - currentOverall);
 
         const pveResults = computePVE(
           remaining,
@@ -383,6 +393,8 @@ export const useDraftStore = create<DraftStore>()(
           tierMetrics,
           tierDropThreshold,
           availabilityS,
+          picksUntilUser,
+          currentOverall,
           { teams: config.teams, flexCount: config.flexCount, ppr: config.ppr }
         );
 
@@ -445,7 +457,8 @@ export const useDraftStore = create<DraftStore>()(
         a.download = 'draft-settings.json';
         a.click();
         window.URL.revokeObjectURL(url);
-      }
+      },
+      clearError: () => set({ error: undefined })
     }),
     {
       name: 'draft-store',
