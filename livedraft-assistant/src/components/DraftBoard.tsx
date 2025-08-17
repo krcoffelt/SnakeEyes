@@ -202,15 +202,17 @@ export default function DraftBoard() {
                     {round}
                   </div>
                   {Array.from({ length: teams }, (_, pickIndex) => {
-                    const teamColumn = pickIndex + 1; // always render by team number left-to-right
-                    const draftedPlayer = draftBoard[round]?.[teamColumn];
-                    const isCurrentPick = round === currentRound && teamColumn === (currentRound % 2 === 1 ? currentPick : (teams - currentPick + 1));
-                    const isUserTeam = teamColumn === config.slot;
+                    const pickOrder = direction === 'left-to-right' ? pickIndex + 1 : (teams - pickIndex);
+                    // draftBoard stores by team column: odd rounds col = pick, even rounds col = teams - pick + 1
+                    const colKey = (round % 2 === 1) ? pickOrder : (teams - pickOrder + 1);
+                    const draftedPlayer = draftBoard[round]?.[colKey];
+                    const isCurrentPick = round === currentRound && pickOrder === currentPick;
+                    const isUserTeam = colKey === config.slot;
                     const overall = draftedPlayer ? draftedPlayer.overall : undefined;
 
                     return (
                       <div
-                        key={teamColumn}
+                        key={pickOrder}
                         className={`w-24 h-16 rounded-lg border transition-all ${
                           isCurrentPick
                             ? 'border-yellow-500'
