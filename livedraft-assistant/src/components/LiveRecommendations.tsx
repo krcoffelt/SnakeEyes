@@ -8,6 +8,7 @@ export default function LiveRecommendations() {
   const { 
     remaining, 
     config, 
+    drafted,
     draft, 
     PPS, 
     PVI, 
@@ -19,28 +20,31 @@ export default function LiveRecommendations() {
     availabilityRisk
   } = useDraftStore();
 
+  const currentOverall = drafted.length + 1;
+  const maxEligible = currentOverall + config.teams; // within next round
+
   const getTopRecommendations = () => {
-    // Only show players with positive value (cheaper on Sleeper than Underdog ADP)
+    // Only show players with positive value and within current window
     const playersWithPositiveValue = remaining
       .filter(player => {
-        // Must have both Underdog ADP and Sleeper rank to calculate value
         if (!player.und_adp || !player.slp_rank) return false;
-        
-        // Calculate value: Sleeper rank - Underdog ADP (positive = cheaper on Sleeper)
         const value = player.slp_rank - player.und_adp;
-        return value > 0;
+        if (value <= 0) return false;
+        const ref = player.und_adp ?? player.slp_rank; // use Underdog ADP primarily
+        return ref <= maxEligible; // relevant to current pick window
       })
       .map(player => ({
         ...player,
-        value: player.slp_rank - player.und_adp,
+        value: player.slp_rank! - player.und_adp!,
         pps: PPS[player.player] || 0
       }))
-      // Sort by value first (highest positive value first), then by PPS
       .sort((a, b) => {
-        if (b.value !== a.value) {
-          return b.value - a.value; // Higher value first
-        }
-        return b.pps - a.pps; // Then by PPS as tiebreaker
+        if (b.value !== a.value) return b.value - a.value; // higher value first
+        // Give slight preference to closer-to-current picks
+        const aDist = Math.abs((a.und_adp ?? a.slp_rank ?? 999) - currentOverall);
+        const bDist = Math.abs((b.und_adp ?? b.slp_rank ?? 999) - currentOverall);
+        if (aDist !== bDist) return aDist - bDist;
+        return b.pps - a.pps;
       })
       .slice(0, 8);
 
@@ -48,27 +52,12 @@ export default function LiveRecommendations() {
   };
 
   const getRecommendationReason = (player: any) => {
-    const reasons = [];
-    
-    // Value-based reason (always positive since we filter for positive value)
+    const reasons = [] as string[];
     reasons.push(`+${player.value} value`);
-    
-    if (rosterNeeds[player.pos]) {
-      reasons.push(`Need ${player.pos}`);
-    }
-    
-    if (tierUrgency[player.player]) {
-      reasons.push('Tier cliff');
-    }
-    
-    if (scarcityMetrics[player.pos]?.urgency > 0.7) {
-      reasons.push('Scarce position');
-    }
-    
-    if (availabilityRisk[player.player]?.takeNow) {
-      reasons.push('Take now');
-    }
-    
+    if (rosterNeeds[player.pos]) reasons.push(`Need ${player.pos}`);
+    if (tierUrgency[player.player]) reasons.push('Tier cliff');
+    if (scarcityMetrics[player.pos]?.urgency > 0.7) reasons.push('Scarce position');
+    if (availabilityRisk[player.player]?.takeNow) reasons.push('Take now');
     return reasons.slice(0, 2).join(' • ') || `+${player.value} value`;
   };
 
@@ -94,7 +83,6 @@ export default function LiveRecommendations() {
           </div>
           Positional Value
         </h3>
-        
         <div className="space-y-3">
           {Object.entries(PVI)
             .sort(([,a], [,b]) => b - a)
@@ -125,13 +113,11 @@ export default function LiveRecommendations() {
           </div>
           Top Value Picks
         </h3>
-        
         {topRecommendations.length > 0 ? (
           <div className="space-y-3">
-            {topRecommendations.map((player, index) => {
+            {topRecommendations.map((player) => {
               const priority = getPriorityLevel(player);
               const reason = getRecommendationReason(player);
-              
               return (
                 <div key={player.player} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="flex items-start justify-between mb-2">
@@ -152,11 +138,9 @@ export default function LiveRecommendations() {
                       {priority.level}
                     </span>
                   </div>
-                  
                   <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                     {reason}
                   </div>
-                  
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       Und: {player.und_adp} • SLP: {player.slp_rank}
@@ -164,9 +148,10 @@ export default function LiveRecommendations() {
                     <div className="flex space-x-1">
                       <button
                         onClick={() => {
-                          const currentPick = remaining.length + 1;
-                          const round = Math.ceil(currentPick / config.teams);
-                          const pick = ((currentPick - 1) % config.teams) + 1;
+                          const totalPicks = useDraftStore.getState().drafted.length;
+                          const nextOverall = totalPicks + 1;
+                          const round = Math.ceil(nextOverall / config.teams);
+                          const pick = ((nextOverall - 1) % config.teams) + 1;
                           draft(player.player, round, pick, 'me');
                         }}
                         className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
@@ -183,10 +168,10 @@ export default function LiveRecommendations() {
         ) : (
           <div className="text-center py-6">
             <div className="text-gray-500 dark:text-gray-400 text-sm mb-2">
-              No value picks available
+              No value picks in range
             </div>
             <div className="text-gray-400 dark:text-gray-500 text-xs">
-              Players will appear here when they have positive value (cheaper on Sleeper than Underdog ADP)
+              Picks are limited to players within the current window (≤ next round)
             </div>
           </div>
         )}
@@ -200,7 +185,6 @@ export default function LiveRecommendations() {
           </div>
           2025 Rookies
         </h3>
-        
         <div className="space-y-3">
           <div className="text-center">
             <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
@@ -208,7 +192,6 @@ export default function LiveRecommendations() {
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Remaining</div>
           </div>
-          
           <div className="text-center">
             <div className="text-lg font-semibold text-green-600 dark:text-green-400">
               {top50Rookies}
