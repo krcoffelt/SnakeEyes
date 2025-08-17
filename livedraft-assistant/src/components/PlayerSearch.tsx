@@ -56,8 +56,8 @@ export default function PlayerSearch() {
         case 'slp_rank': aValue = a.slp_rank || 999; bValue = b.slp_rank || 999; break;
         case 'value': aValue = a.value || 0; bValue = b.value || 0; break;
         case 'mib': {
-          const aM = (availabilityRisk as any)[a.player]?.makeItBack ?? 0;
-          const bM = (availabilityRisk as any)[b.player]?.makeItBack ?? 0;
+          const aM = availabilityRisk[a.player]?.makeItBack ?? 0;
+          const bM = availabilityRisk[b.player]?.makeItBack ?? 0;
           aValue = aM; bValue = bM; break;
         }
         default: aValue = a.und_rank || 999; bValue = b.und_rank || 999;
@@ -349,8 +349,8 @@ export default function PlayerSearch() {
                     )}
                   </td>
                   <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
-                    {(availabilityRisk as any)[player.player]?.makeItBack != null
-                      ? `${Math.round(((availabilityRisk as any)[player.player]?.makeItBack as number) * 100)}%`
+                    {availabilityRisk[player.player]?.makeItBack != null
+                      ? `${Math.round((availabilityRisk[player.player]?.makeItBack as number) * 100)}%`
                       : '-'}
                   </td>
                   <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
