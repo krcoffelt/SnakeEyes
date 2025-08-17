@@ -1,7 +1,22 @@
 import Papa from 'papaparse';
 import { Player, CSVData } from './types';
-import { normalizeName, safeParseNumber, hashData } from './util';
+import { normalizeName, safeParseNumber, hashData, playerKey } from './util';
 import { isRookie2025, getRookieInfo } from './rookieData';
+
+// Known aliases to normalize source naming quirks
+const NAME_ALIASES: Record<string, string> = {
+  "tj hockenson": "tj hockenson",
+  "t.j. hockenson": "tj hockenson",
+  "dk metcalf": "dk metcalf",
+  "d.k. metcalf": "dk metcalf",
+  "san francisco 49ers d/st": "49ers d/st",
+  "49ers dst": "49ers d/st",
+};
+
+function applyAlias(name: string): string {
+  const key = playerKey(name);
+  return NAME_ALIASES[key] ?? name;
+}
 
 /**
  * Fetch and parse CSV data using PapaParse
@@ -39,7 +54,7 @@ export async function loadUnderdog(): Promise<Player[]> {
   
   return data.map(row => {
     // Flexible header mapping for your actual CSV format
-    const player = String(row.Player || row.player || '');
+    const player = applyAlias(String(row.Player || row.player || ''));
     const pos = String(row.Pos || row.pos || row.Position || row.position || '');
     const team = String(row.Team || row.team || '');
     const rank = safeParseNumber(row.Rank || row.rank);
@@ -65,7 +80,7 @@ export async function loadSleeper(): Promise<Player[]> {
   
   return data.map(row => {
     const rank = safeParseNumber(row['Sleeper ADP'] || row['Sleeper ADP'] || row.rank);
-    const player = String(row.Name || row.name || row.Player || row.player || '');
+    const player = applyAlias(String(row.Name || row.name || row.Player || row.player || ''));
     const pos = String(row.Pos || row.pos || row.Position || row.position || '');
     const team = String(row.Team || row.team || '');
     const bye = safeParseNumber(row.BYE || row.bye);
@@ -91,51 +106,39 @@ export function mergePlayers(
   blendConfig: { und: number; slp: number } = { und: 0.6, slp: 0.4 }
 ): Player[] {
   const sleeperMap = new Map<string, Player>();
-  
-  // Create normalized map of Sleeper data
   sleeper.forEach(player => {
-    const normalizedName = normalizeName(player.player);
-    sleeperMap.set(normalizedName, player);
+    const key = playerKey(player.player);
+    sleeperMap.set(key, player);
   });
   
   const merged: Player[] = [];
-  const usedSleeperNames = new Set<string>();
+  const usedSleeper = new Set<string>();
   
-  // Process Underdog data first
   underdog.forEach(udPlayer => {
-    const normalizedName = normalizeName(udPlayer.player);
-    const sleeperPlayer = sleeperMap.get(normalizedName);
-    
-    if (sleeperPlayer) {
-      // Merge both sources
+    const key = playerKey(udPlayer.player);
+    const slp = sleeperMap.get(key);
+    if (slp) {
       const mergedPlayer: Player = {
-        player: udPlayer.player, // Prefer Underdog casing
-        pos: udPlayer.pos || sleeperPlayer.pos,
-        team: udPlayer.team || sleeperPlayer.team,
-        bye: sleeperPlayer.bye, // BYE week from Sleeper
-        isRookie: isRookie2025(udPlayer.player), // Check rookie status
+        player: udPlayer.player,
+        pos: udPlayer.pos || slp.pos,
+        team: udPlayer.team || slp.team,
+        bye: slp.bye,
+        isRookie: isRookie2025(udPlayer.player),
         und_rank: udPlayer.und_rank,
         und_adp: udPlayer.und_adp,
-        slp_rank: sleeperPlayer.slp_rank,
+        slp_rank: slp.slp_rank,
       };
-      
-      // Calculate derived fields
       if (mergedPlayer.und_rank !== null && mergedPlayer.slp_rank !== null) {
         mergedPlayer.value = mergedPlayer.slp_rank - mergedPlayer.und_rank;
-        mergedPlayer.blend_rank = blendConfig.und * mergedPlayer.und_rank + 
-                                  blendConfig.slp * mergedPlayer.slp_rank;
+        mergedPlayer.blend_rank = blendConfig.und * mergedPlayer.und_rank + blendConfig.slp * mergedPlayer.slp_rank;
       } else if (mergedPlayer.und_rank !== null) {
-        // Only Underdog rank available
-        mergedPlayer.blend_rank = mergedPlayer.und_rank * 1.2; // Penalty for missing Sleeper
+        mergedPlayer.blend_rank = mergedPlayer.und_rank * 1.2;
       } else if (mergedPlayer.slp_rank !== null) {
-        // Only Sleeper rank available
-        mergedPlayer.blend_rank = mergedPlayer.slp_rank * 1.2; // Penalty for missing Underdog
+        mergedPlayer.blend_rank = mergedPlayer.slp_rank * 1.2;
       }
-      
       merged.push(mergedPlayer);
-      usedSleeperNames.add(normalizedName);
+      usedSleeper.add(key);
     } else {
-      // Only Underdog data available
       const soloPlayer: Player = {
         ...udPlayer,
         blend_rank: udPlayer.und_rank ? udPlayer.und_rank * 1.2 : null,
@@ -144,19 +147,17 @@ export function mergePlayers(
     }
   });
   
-  // Add remaining Sleeper-only players
-  sleeper.forEach(slpPlayer => {
-    const normalizedName = normalizeName(slpPlayer.player);
-    if (!usedSleeperNames.has(normalizedName)) {
+  sleeper.forEach(slp => {
+    const key = playerKey(slp.player);
+    if (!usedSleeper.has(key)) {
       const soloPlayer: Player = {
-        ...slpPlayer,
-        blend_rank: slpPlayer.slp_rank ? slpPlayer.slp_rank * 1.2 : null,
+        ...slp,
+        blend_rank: slp.slp_rank ? slp.slp_rank * 1.2 : null,
       };
       merged.push(soloPlayer);
     }
   });
   
-  // Sort by blend_rank (nulls last)
   return merged.sort((a, b) => {
     if (a.blend_rank === null && b.blend_rank === null) return 0;
     if (a.blend_rank === null) return 1;
@@ -165,16 +166,10 @@ export function mergePlayers(
   });
 }
 
-/**
- * Generate hash of source data for persistence invalidation
- */
 export function hashSourceData(underdog: Player[], sleeper: Player[]): string {
   return hashData({ underdog, sleeper });
 }
 
-/**
- * Load and merge all player data
- */
 export async function loadAllPlayerData(
   blendConfig: { und: number; slp: number } = { und: 0.6, slp: 0.4 }
 ): Promise<{ players: Player[]; dataHash: string }> {
@@ -183,10 +178,8 @@ export async function loadAllPlayerData(
       loadUnderdog(),
       loadSleeper()
     ]);
-    
     const players = mergePlayers(underdog, sleeper, blendConfig);
     const dataHash = hashSourceData(underdog, sleeper);
-    
     return { players, dataHash };
   } catch (error) {
     console.error('Failed to load player data:', error);

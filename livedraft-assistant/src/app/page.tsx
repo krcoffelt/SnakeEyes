@@ -113,7 +113,7 @@ export default function LeagueSetup() {
                     </button>
                   ))}
                 </div>
-              </div>
+        </div>
 
               {/* FLEX Configuration */}
               <div className="space-y-3">
@@ -209,4 +209,4 @@ export default function LeagueSetup() {
       </div>
     </div>
   );
-} 
+}

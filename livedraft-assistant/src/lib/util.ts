@@ -15,6 +15,16 @@ export function normalizeName(s: string): string {
 }
 
 /**
+ * Canonical key for player-name matching across sources
+ * - normalized
+ * - remove common punctuation (dots, apostrophes)
+ */
+export function playerKey(name: string): string {
+  const n = normalizeName(name);
+  return n.replace(/[.'’]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/**
  * Calculate z-scores, clip to ±clip, then rescale to [0,1]
  */
 export function zscoreClip01(x: number[], clip: number = 2): number[] {

@@ -103,9 +103,10 @@ export default function PlayerSearch() {
   };
   
   const quickDraft = (playerName: string, who: 'me' | 'opp') => {
-    const currentPick = remaining.length + 1;
-    const round = Math.ceil(currentPick / config.teams);
-    const pick = ((currentPick - 1) % config.teams) + 1;
+    const totalPicks = useDraftStore.getState().drafted.length;
+    const nextOverall = totalPicks + 1;
+    const round = Math.ceil(nextOverall / config.teams);
+    const pick = ((nextOverall - 1) % config.teams) + 1;
     draft(playerName, round, pick, who);
     setSearchTerm('');
   };
