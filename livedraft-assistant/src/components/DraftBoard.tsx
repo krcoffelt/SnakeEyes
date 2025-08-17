@@ -204,7 +204,7 @@ export default function DraftBoard() {
                   {Array.from({ length: teams }, (_, pickIndex) => {
                     const pick = direction === 'left-to-right' ? pickIndex + 1 : teams - pickIndex;
                     const draftedPlayer = draftBoard[round]?.[pick];
-                    const isCurrentPick = round === currentRound && pick === currentPick;
+                    const isCurrentPick = round === currentRound && pick === (currentRound % 2 === 1 ? currentPick : (teams - currentPick + 1));
                     const isUserTeam = pick === config.slot;
                     const overall = draftedPlayer ? draftedPlayer.overall : undefined;
 
