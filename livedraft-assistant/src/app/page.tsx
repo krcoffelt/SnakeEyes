@@ -77,8 +77,8 @@ export default function LeagueSetup() {
                     onClick={() => setLeagueSettings(prev => ({ ...prev, teams: 10 }))}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       leagueSettings.teams === 10
-                        ? 'border-purple-400 bg-purple-500/20 text-white'
-                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
+                        ? 'border-orange-400 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 hover:border-orange-300/50'
                     }`}
                   >
                     <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>10</div>
@@ -88,8 +88,8 @@ export default function LeagueSetup() {
                     onClick={() => setLeagueSettings(prev => ({ ...prev, teams: 12 }))}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       leagueSettings.teams === 12
-                        ? 'border-purple-400 bg-purple-500/20 text-white'
-                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
+                        ? 'border-orange-400 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 hover:border-orange-300/50'
                     }`}
                   >
                     <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>12</div>
@@ -111,8 +111,8 @@ export default function LeagueSetup() {
                       onClick={() => setLeagueSettings(prev => ({ ...prev, ppr: scoring as any }))}
                       className={`p-3 rounded-xl border-2 transition-all ${
                         leagueSettings.ppr === scoring
-                          ? 'border-purple-400 bg-purple-500/20 text-white'
-                          : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
+                          ? 'border-orange-400 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                          : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 hover:border-orange-300/50'
                       }`}
                     >
                       <div className="font-medium" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>{scoring}</div>
@@ -132,8 +132,8 @@ export default function LeagueSetup() {
                     onClick={() => setLeagueSettings(prev => ({ ...prev, flexCount: 1 }))}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       leagueSettings.flexCount === 1
-                        ? 'border-purple-400 bg-purple-500/20 text-white'
-                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
+                        ? 'border-orange-400 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 hover:border-orange-300/50'
                     }`}
                   >
                     <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>1</div>
@@ -143,9 +143,9 @@ export default function LeagueSetup() {
                     onClick={() => setLeagueSettings(prev => ({ ...prev, flexCount: 2 }))}
                     className={`p-4 rounded-xl border-2 transition-all ${
                       leagueSettings.flexCount === 2
-                        ? 'border-purple-400 bg-purple-500/20 text-white'
-                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10'
-                    }`}
+                        ? 'border-orange-400 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                        : 'border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 hover:border-orange-300/50'
+                      }`}
                   >
                     <div className="text-2xl font-bold" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>2</div>
                     <div className="text-sm" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>FLEX</div>
@@ -161,7 +161,7 @@ export default function LeagueSetup() {
                 <select
                   value={leagueSettings.slot}
                   onChange={(e) => setLeagueSettings(prev => ({ ...prev, slot: parseInt(e.target.value) }))}
-                  className="w-full p-4 bg-white/10 border border-white/20 rounded-xl text-white text-center text-lg font-medium focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full p-4 bg-white/10 border border-white/20 rounded-xl text-white text-center text-lg font-medium focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all"
                   style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
                 >
                   {Array.from({ length: leagueSettings.teams }, (_, i) => (
@@ -178,7 +178,7 @@ export default function LeagueSetup() {
               <button
                 onClick={handleStartDraft}
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
                 style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
               >
                 {isLoading ? (
