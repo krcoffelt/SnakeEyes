@@ -54,7 +54,7 @@ export default function DraftPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0f1a]">
       {loading && (
         <div className="w-full bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-center py-2 text-sm">Loading player data…</div>
       )}
@@ -95,7 +95,7 @@ export default function DraftPage() {
       </div>
 
       {/* Sticky context bar */}
-      <div className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#0a0f1a]/60 bg-white/80 dark:bg-[#0a0f1a]/80 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-4">
