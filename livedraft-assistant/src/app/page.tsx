@@ -51,7 +51,6 @@ export default function LeagueSetup() {
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
-              <Trophy className="h-16 w-16 text-yellow-300 mr-4" />
               <div>
                 <h1 className="text-5xl font-bold text-white mb-2 drop-shadow-lg" style={{ fontFamily: 'Times New Roman, serif' }}>Draft Value Assistant</h1>
                 <p className="text-xl text-yellow-100 drop-shadow-md" style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>Powered by Advanced PVE</p>
