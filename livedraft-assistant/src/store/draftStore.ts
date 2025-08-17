@@ -26,7 +26,7 @@ interface DraftStore {
   flexPressure: number;
   scarcityMetrics: { [pos: string]: { count: number; urgency: number } };
   tierUrgency: { [playerName: string]: number };
-  availabilityRisk: { [playerName: string]: { risk: number; takeNow: boolean } };
+  availabilityRisk: { [playerName: string]: { risk: number; takeNow: boolean; makeItBack?: number } };
   searchQuery: string;
   positionFilter: string;
   valueThreshold: number;
