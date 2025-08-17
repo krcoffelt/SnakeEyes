@@ -13,7 +13,7 @@ export default function PlayerSearch() {
   const [draftRound, setDraftRound] = useState(1);
   const [draftPick, setDraftPick] = useState(1);
   const [draftBy, setDraftBy] = useState<'me' | 'opp'>('opp');
-  const [sortBy, setSortBy] = useState<'rank' | 'adp' | 'value'>('rank');
+  const [sortBy, setSortBy] = useState<'rank' | 'und_adp' | 'slp_rank' | 'value'>('rank');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [visiblePlayers, setVisiblePlayers] = useState({ start: 0, end: 10 });
   
@@ -55,9 +55,13 @@ export default function PlayerSearch() {
           aValue = a.und_rank || 999;
           bValue = b.und_rank || 999;
           break;
-        case 'adp':
+        case 'und_adp':
           aValue = a.und_adp || 999;
           bValue = b.und_adp || 999;
+          break;
+        case 'slp_rank':
+          aValue = a.slp_rank || 999;
+          bValue = b.slp_rank || 999;
           break;
         case 'value':
           aValue = a.value || 0;
@@ -78,7 +82,7 @@ export default function PlayerSearch() {
     return sorted;
   };
   
-  const handleSort = (column: 'rank' | 'adp' | 'value') => {
+  const handleSort = (column: 'rank' | 'und_adp' | 'slp_rank' | 'value') => {
     if (sortBy === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -250,28 +254,39 @@ export default function PlayerSearch() {
                 </th>
                 <th 
                   className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
-                  onClick={() => handleSort('adp')}
+                  onClick={() => handleSort('und_adp')}
                 >
                   <div className="flex items-center">
-                    ADP
-                    {sortBy === 'adp' && (
+                    UND ADP
+                    {sortBy === 'und_adp' && (
                       sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />
                     )}
                   </div>
                 </th>
-                <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
-                  BYE
+                <th 
+                  className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onClick={() => handleSort('slp_rank')}
+                >
+                  <div className="flex items-center">
+                    SLP ADP
+                    {sortBy === 'slp_rank' && (
+                      sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />
+                    )}
+                  </div>
                 </th>
                 <th 
                   className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                   onClick={() => handleSort('value')}
                 >
                   <div className="flex items-center">
-                    VALUE
+                    DIFF
                     {sortBy === 'value' && (
                       sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />
                     )}
                   </div>
+                </th>
+                <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
+                  BYE
                 </th>
                 <th className="text-left py-4 px-4 font-medium text-gray-700 dark:text-gray-300">
                   ACTIONS
@@ -315,20 +330,23 @@ export default function PlayerSearch() {
                     {player.und_adp ? player.und_adp.toFixed(1) : '-'}
                   </td>
                   <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
-                    {player.bye || '-'}
+                    {player.slp_rank ? player.slp_rank.toFixed(1) : '-'}
                   </td>
                   <td className="py-4 px-4">
-                    {player.value ? (
+                    {player.und_adp && player.slp_rank ? (
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        player.value > 0 
+                        player.und_adp < player.slp_rank
                           ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
                           : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
                       }`}>
-                        {player.value > 0 ? `+${player.value}` : player.value.toString()}
+                        {player.und_adp < player.slp_rank ? `+${(player.slp_rank - player.und_adp).toFixed(1)}` : `${(player.und_adp - player.slp_rank).toFixed(1)}`}
                       </span>
                     ) : (
                       '-'
                     )}
+                  </td>
+                  <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
+                    {player.bye || '-'}
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex space-x-1">
@@ -385,11 +403,11 @@ export default function PlayerSearch() {
                       {player.player}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {player.pos} • {player.team} • Und: {player.und_rank} • SLP: {player.slp_rank}
+                      {player.pos} • {player.team} • Und ADP: {player.und_adp ? player.und_adp.toFixed(1) : 'N/A'} • SLP ADP: {player.slp_rank ? player.slp_rank.toFixed(1) : 'N/A'}
                       {player.bye && ` • BYE: ${player.bye}`}
                       {player.isRookie && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
-                          ROOKIE
+                        <span className="ml-2 inline-flex items-center px-1 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                          R
                         </span>
                       )}
                     </div>
