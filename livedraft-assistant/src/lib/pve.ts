@@ -198,19 +198,83 @@ function computeRosterNeeds(
 ): { rosterNeeds: { [pos: string]: number }; flexPressure: number } {
   const rosterNeeds: { [pos: string]: number } = {};
   const baseRequirements = { QB: 1, RB: 2, WR: 2, TE: 1, DEF: 1, K: 1 } as const;
-  const flexRequirements = { RB: config.flexCount === 2 ? 1 : 0, WR: config.flexCount === 2 ? 1 : 0 } as const;
-  (Object.keys(baseRequirements) as Array<keyof typeof baseRequirements>).forEach(pos => {
-    const current = myRoster[pos] || 0;
-    const totalRequired = baseRequirements[pos] + (flexRequirements[pos as 'RB' | 'WR'] || 0);
-    if (current >= totalRequired) rosterNeeds[pos] = 0; else if (current === 0) rosterNeeds[pos] = 1; else rosterNeeds[pos] = 0.5;
-  });
-  const totalRBWR = myRoster.RB + myRoster.WR;
-  const flexTarget = 4 + config.flexCount;
-  const flexPressure = Math.max(0, flexTarget - totalRBWR) / config.flexCount;
-  if (flexPressure > 0) {
-    rosterNeeds.RB = Math.max(rosterNeeds.RB, flexPressure);
-    rosterNeeds.WR = Math.max(rosterNeeds.WR, flexPressure);
+
+  const totalStarters = baseRequirements.QB + baseRequirements.RB + baseRequirements.WR + baseRequirements.TE + baseRequirements.DEF + baseRequirements.K + config.flexCount;
+  const draftedTotal = myRoster.total || 0;
+  const earlyPhase = draftedTotal < Math.ceil(totalStarters / 2);
+  const benchPhase = draftedTotal >= totalStarters;
+
+  // Combined RB/WR needs including FLEX
+  const combinedRequiredRBWR = baseRequirements.RB + baseRequirements.WR + config.flexCount; // 4 + flex
+  const currentRBWR = (myRoster.RB || 0) + (myRoster.WR || 0);
+  const combinedFraction = Math.max(0, Math.min(1, (combinedRequiredRBWR - currentRBWR) / combinedRequiredRBWR));
+
+  // Individual base fractions for RB/WR toward starter requirements
+  const rbBaseNeed = Math.max(0, Math.min(1, (baseRequirements.RB - (myRoster.RB || 0)) / baseRequirements.RB));
+  const wrBaseNeed = Math.max(0, Math.min(1, (baseRequirements.WR - (myRoster.WR || 0)) / baseRequirements.WR));
+
+  // RB need: combine individual starter deficit with shared FLEX deficit
+  let rbNeed = Math.max(rbBaseNeed, 0.5 * combinedFraction);
+  // WR need: combine individual starter deficit with shared FLEX deficit
+  let wrNeed = Math.max(wrBaseNeed, 0.5 * combinedFraction);
+
+  // Bench-aware slight bias to RB/WR once starters+FLEX are satisfied
+  if (benchPhase) {
+    rbNeed = Math.max(rbNeed, 0.1);
+    wrNeed = Math.max(wrNeed, 0.1);
   }
+
+  // PPR nuance: elevate WR/TE slightly in PPR/Half PPR
+  if (config.ppr === 'PPR') {
+    wrNeed += 0.05;
+  } else if (config.ppr === 'Half PPR') {
+    wrNeed += 0.02;
+  }
+
+  // Phase sensitivity: in early/mid phases, favor RB/WR slightly; push K/DEF late
+  if (earlyPhase) {
+    rbNeed += 0.03;
+    wrNeed += 0.03;
+  }
+
+  // Clamp RB/WR
+  rosterNeeds.RB = Math.max(0, Math.min(1, rbNeed));
+  rosterNeeds.WR = Math.max(0, Math.min(1, wrNeed));
+
+  // QB need: single-start dampening until bench phase
+  const qbCurrent = myRoster.QB || 0;
+  if (qbCurrent >= baseRequirements.QB) {
+    rosterNeeds.QB = benchPhase ? 0.05 : 0.0;
+  } else {
+    rosterNeeds.QB = 1 - qbCurrent / baseRequirements.QB; // 1 if none
+  }
+
+  // TE need: similar dampening
+  const teCurrent = myRoster.TE || 0;
+  if (teCurrent >= baseRequirements.TE) {
+    rosterNeeds.TE = benchPhase ? 0.05 : 0.0;
+  } else {
+    rosterNeeds.TE = 1 - teCurrent / baseRequirements.TE;
+  }
+
+  // DEF/K: prefer late; only start to appear in bench/late phases
+  const defCurrent = myRoster.DEF || 0;
+  const kCurrent = myRoster.K || 0;
+  if (defCurrent >= baseRequirements.DEF) {
+    rosterNeeds.DEF = benchPhase ? 0.05 : 0.0;
+  } else {
+    rosterNeeds.DEF = benchPhase ? 0.3 : (earlyPhase ? 0.0 : 0.1);
+  }
+  if (kCurrent >= baseRequirements.K) {
+    rosterNeeds.K = benchPhase ? 0.05 : 0.0;
+  } else {
+    rosterNeeds.K = benchPhase ? 0.3 : (earlyPhase ? 0.0 : 0.1);
+  }
+
+  // Flex pressure (normalized): how much RB/WR capacity remains relative to FLEX
+  const flexRemaining = Math.max(0, combinedRequiredRBWR - currentRBWR);
+  const flexPressure = Math.max(0, Math.min(1, flexRemaining / Math.max(1, config.flexCount)));
+
   return { rosterNeeds, flexPressure };
 }
 
