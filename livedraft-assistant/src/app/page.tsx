@@ -35,7 +35,7 @@ export default function LeagueSetup() {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'url("/images/fiery-gradient-background.jpg")',
+          backgroundImage: 'url("/images/fiery-gradient-background.webp")',
         }}
       ></div>
       
