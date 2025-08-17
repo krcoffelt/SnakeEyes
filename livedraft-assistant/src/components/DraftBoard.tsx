@@ -1,14 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDraftStore } from '../store/draftStore';
-import { Grid, Clock, User, Users, Undo2, RotateCcw } from 'lucide-react';
+import { Grid, Clock, User, Users, Undo2, RotateCcw, ChevronUp, ChevronDown } from 'lucide-react';
 
 export default function DraftBoard() {
   const { draftBoard, config, drafted, undo, resetDraft } = useDraftStore();
+  const [visibleRounds, setVisibleRounds] = useState({ start: 1, end: 5 });
   
   const maxRounds = 15; // Maximum rounds to display
   const teams = config.teams;
+  const roundsToShow = 5; // Number of rounds visible at once
   
   const getPositionColor = (pos: string) => {
     switch (pos) {
@@ -34,6 +36,32 @@ export default function DraftBoard() {
   };
   
   const { round: currentRound, pick: currentPick } = getCurrentPick();
+  
+  // Auto-scroll to keep current round visible
+  useEffect(() => {
+    if (currentRound < visibleRounds.start || currentRound > visibleRounds.end) {
+      const newStart = Math.max(1, currentRound - Math.floor(roundsToShow / 2));
+      const newEnd = Math.min(maxRounds, newStart + roundsToShow - 1);
+      setVisibleRounds({ start: newStart, end: newEnd });
+    }
+  }, [currentRound, visibleRounds.start, visibleRounds.end]);
+  
+  const scrollUp = () => {
+    setVisibleRounds(prev => ({
+      start: Math.max(1, prev.start - roundsToShow),
+      end: Math.max(roundsToShow, prev.end - roundsToShow)
+    }));
+  };
+  
+  const scrollDown = () => {
+    setVisibleRounds(prev => ({
+      start: Math.min(maxRounds - roundsToShow + 1, prev.start + roundsToShow),
+      end: Math.min(maxRounds, prev.end + roundsToShow)
+    }));
+  };
+  
+  const canScrollUp = visibleRounds.start > 1;
+  const canScrollDown = visibleRounds.end < maxRounds;
   
   return (
     <div className="w-full">
@@ -70,12 +98,47 @@ export default function DraftBoard() {
       
       {/* Live Draft Board - Wide and Prominent */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          <div className="w-5 h-5 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mr-3">
-            <Grid className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <div className="w-5 h-5 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mr-3">
+              <Grid className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+            </div>
+            Live Draft Board
+          </h2>
+          
+          {/* Scroll Controls */}
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Rounds {visibleRounds.start}-{visibleRounds.end} of {maxRounds}
+            </span>
+            <div className="flex space-x-1">
+              <button
+                onClick={scrollUp}
+                disabled={!canScrollUp}
+                className={`p-2 rounded-lg transition-colors ${
+                  canScrollUp
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                }`}
+                title="Scroll up"
+              >
+                <ChevronUp className="h-4 w-4" />
+              </button>
+              <button
+                onClick={scrollDown}
+                disabled={!canScrollDown}
+                className={`p-2 rounded-lg transition-colors ${
+                  canScrollDown
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                }`}
+                title="Scroll down"
+              >
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          Live Draft Board
-        </h2>
+        </div>
         
         {/* Current Pick Indicator */}
         <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
@@ -95,7 +158,7 @@ export default function DraftBoard() {
           </div>
         </div>
         
-        {/* Draft Board Grid */}
+        {/* Draft Board Grid - Scrollable */}
         <div className="overflow-x-auto">
           <div className="min-w-max">
             {/* Header Row */}
@@ -110,9 +173,11 @@ export default function DraftBoard() {
               ))}
             </div>
             
-            {/* Draft Rows */}
-            {Array.from({ length: maxRounds }, (_, roundIndex) => {
-              const round = roundIndex + 1;
+            {/* Draft Rows - Only Show Visible Rounds */}
+            {Array.from({ length: roundsToShow }, (_, index) => {
+              const round = visibleRounds.start + index;
+              if (round > maxRounds) return null;
+              
               const direction = getDraftDirection(round);
               
               return (
